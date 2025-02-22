@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
 import potenday.backend.domain.repository.LoginInfoRepository;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
 import java.util.Optional;
 

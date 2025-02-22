@@ -1,4 +1,4 @@
-package potenday.backend.support;
+package potenday.backend.infra.provider;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

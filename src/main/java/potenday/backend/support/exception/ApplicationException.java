@@ -1,4 +1,4 @@
-package potenday.backend.support;
+package potenday.backend.support.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package potenday.backend.infra;
+package potenday.backend.infra.provider;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;

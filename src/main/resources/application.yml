@@ -14,6 +14,12 @@ spring:
   jwt:
     secret: ${JWT_SECRET}
 
+  ai:
+    clova:
+      api-key: ${CLOVA_API_KEY}
+      chat:
+        app-name: testapp
+
   profiles:
     active: local
 

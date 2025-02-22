@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
 import potenday.backend.domain.repository.LoginInfoRepository;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
 @RequiredArgsConstructor
 @Component
@@ -25,7 +25,7 @@ class LoginInfoWriter {
         if (method.equals(LoginMethod.EMAIL)) {
             throw new IllegalArgumentException();
         }
-        
+
         LoginInfo newLoginInfo = LoginInfo.create(idProvider.nextId(), userId, method, loginKey);
         loginInfoRepository.save(newLoginInfo);
     }

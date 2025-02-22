@@ -1,4 +1,4 @@
-package potenday.backend.infra;
+package potenday.backend.infra.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import potenday.backend.application.AuthService;
-import potenday.backend.support.ApiResponse;
-import potenday.backend.support.ApplicationException;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ApplicationException;
+import potenday.backend.support.exception.ErrorCode;
+import potenday.backend.support.response.ApiResponse;
 
 @RequiredArgsConstructor
 @Configuration
@@ -37,6 +37,7 @@ class SecurityConfig {
             .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(requests -> requests
+                .requestMatchers("/test/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/", "/actuator/**")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/*/auth/register", "/api/*/auth/login", "/api/*/auth/token")
