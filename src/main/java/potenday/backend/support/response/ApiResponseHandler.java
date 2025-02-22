@@ -1,4 +1,4 @@
-package potenday.backend.support;
+package potenday.backend.support.response;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
@@ -8,14 +8,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import potenday.backend.support.exception.ApplicationException;
+import potenday.backend.support.exception.ErrorCode;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice(basePackages = "potenday.backend.web", basePackageClasses = ApiResponseHandler.class)
 @Slf4j
@@ -62,6 +69,19 @@ class ApiResponseHandler implements ResponseBodyAdvice<Object> {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ApiResponse<?> handleException(MethodArgumentNotValidException e) {
+        log.warn(e.getMessage(), e);
+        Map<String, String> errors = new HashMap<>();
+
+        e.getBindingResult().getAllErrors().forEach(error -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return ApiResponse.of(ErrorCode.WRONG_PARAMETER.toException(), errors);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ApiResponse<?> handleException(HttpMessageNotReadableException e) {
         log.warn(e.getMessage(), e);
         return ApiResponse.of(ErrorCode.WRONG_PARAMETER.toException());
     }

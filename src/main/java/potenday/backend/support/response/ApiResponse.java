@@ -1,8 +1,9 @@
-package potenday.backend.support;
+package potenday.backend.support.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import org.springframework.http.HttpStatus;
+import potenday.backend.support.exception.ApplicationException;
 
 @JsonInclude(Include.NON_NULL)
 public record ApiResponse<T>(
@@ -13,6 +14,10 @@ public record ApiResponse<T>(
 
     public static <T> ApiResponse<T> of(ApplicationException e) {
         return new ApiResponse<>(e.getHttpStatus(), e.getMessage(), null);
+    }
+
+    public static <T> ApiResponse<T> of(ApplicationException e, T data) {
+        return new ApiResponse<>(e.getHttpStatus(), e.getMessage(), data);
     }
 
     static <T> ApiResponse<T> of(HttpStatus status, T data) {
