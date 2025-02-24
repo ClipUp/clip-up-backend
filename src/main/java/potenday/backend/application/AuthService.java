@@ -49,6 +49,10 @@ public class AuthService {
     }
 
     public String[] reissueToken(String refreshToken) {
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw ErrorCode.UNAUTHORIZED.toException();
+        }
+
         Long userId = tokenProcessor.getUserId(refreshToken).orElseThrow(ErrorCode.UNAUTHORIZED::toException);
 
         String accessToken = tokenProcessor.issueRefreshToken(userId);

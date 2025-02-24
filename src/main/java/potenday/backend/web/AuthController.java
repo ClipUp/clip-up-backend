@@ -47,7 +47,7 @@ class AuthController {
     }
 
     @PostMapping("/token")
-    ResponseEntity<TokenResponse> login(@CookieValue(REFRESH_TOKEN_KEY) String refreshToken) {
+    ResponseEntity<TokenResponse> login(@CookieValue(value = REFRESH_TOKEN_KEY, required = false) String refreshToken) {
         String[] tokens = authService.reissueToken(refreshToken);
         return ResponseEntity.status(HttpStatus.OK)
             .header(HttpHeaders.SET_COOKIE, setRefreshTokenCookie(tokens[1]))
