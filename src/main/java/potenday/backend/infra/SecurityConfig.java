@@ -20,7 +20,6 @@ import potenday.backend.support.ApiResponse;
 import potenday.backend.support.ApplicationException;
 import potenday.backend.support.ErrorCode;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -64,16 +63,24 @@ class SecurityConfig {
     }
 
     private CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("HEAD", "POST", "GET", "DELETE", "PUT"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+
+        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+
+        return request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            String origin = request.getHeader("Origin");
+
+            if (origin != null) {
+                config.setAllowedOrigins(List.of(origin));
+            }
+
+            config.setAllowedMethods(List.of("HEAD", "POST", "GET", "DELETE", "PUT"));
+            config.setAllowedHeaders(List.of("*"));
+            config.setAllowCredentials(true);
+
+            return config;
+        };
     }
 
 }
