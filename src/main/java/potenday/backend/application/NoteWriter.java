@@ -19,6 +19,7 @@ class NoteWriter {
     private final ClockProvider clockProvider;
     private final FileUploader fileUploader;
     private final STTConverter sttConverter;
+    private final ParagraphSplitter paragraphSplitter;
     private final ChatClient chatClient;
     private final NoteRepository noteRepository;
 
@@ -45,6 +46,18 @@ class NoteWriter {
 
         Note updatedNote = existNote.addScript(script);
         noteRepository.save(updatedNote);
+    }
+
+    Note finish(Long noteId, MultipartFile file) {
+        Note existNote = findNoteById(noteId);
+
+        String audioFileUrl = fileUploader.upload(file);
+        String content = convertScriptToContent(existNote.getScript());
+
+        Note finishedNote = existNote.finish(audioFileUrl, content, clockProvider.millis());
+        noteRepository.save(finishedNote);
+
+        return finishedNote;
     }
 
     @Transactional
@@ -79,6 +92,17 @@ class NoteWriter {
 
     private Note findNoteById(Long noteId) {
         return noteRepository.findById(noteId).orElseThrow(ErrorCode.NOTE_NOT_FOUNDED::toException);
+    }
+
+    private String convertScriptToContent(String script) {
+        List<String> paragraphs = paragraphSplitter.apply(script);
+
+        StringBuilder sb = new StringBuilder();
+        for (String paragraph : paragraphs) {
+            sb.append(chatClient.prompt().user(paragraph).call().content());
+        }
+
+        return sb.toString();
     }
 
 }
