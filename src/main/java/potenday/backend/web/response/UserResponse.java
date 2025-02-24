@@ -3,7 +3,7 @@ package potenday.backend.web.response;
 import potenday.backend.domain.User;
 
 public record UserResponse(
-    Long id,
+    String id,
     String email,
     String username
 ) {

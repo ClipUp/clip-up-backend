@@ -1,7 +1,7 @@
 services:
-  mysql:
-    image: 'mysql:8.0'
+  mongodb:
+    image: 'mongo:latest'
     env_file:
       - .env
     ports:
-      - '3306:3306'
+      - '27017:27017'

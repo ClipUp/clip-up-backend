@@ -32,7 +32,7 @@ class AuthController {
 
     @PutMapping("/password")
     void updatePassword(
-        @AuthenticationPrincipal Long userId,
+        @AuthenticationPrincipal String userId,
         @RequestBody @Valid PasswordUpdateRequest request
     ) {
         authService.updatePassword(userId, request.originalPassword(), request.newPassword());

@@ -15,3 +15,15 @@ create table login_info (
     password  varchar(255)   null,
     unique (method, login_key)
 );
+
+create table note (
+    id        bigint         not null   primary key,
+    title     varchar(40),
+    script    longtext,
+    audio_file_url  varchar(255),
+    content     longtext,
+    is_finished tinyint(1)   not null,
+    create_time bigint       not null,
+    update_time bigint       not null,
+    is_deleted  tinyint(1)   not null
+);

@@ -11,12 +11,12 @@ public class UserService {
     private final UserReader userReader;
     private final UserWriter userWriter;
 
-    public User readUser(Long id) {
-        return userReader.read(id);
+    public User readUser(String userId) {
+        return userReader.read(userId);
     }
 
-    public User updateUser(Long id, String email, String username) {
-        return userWriter.update(id, email, username);
+    public User updateUser(String userId, String email, String username) {
+        return userWriter.update(userId, email, username);
     }
 
 }

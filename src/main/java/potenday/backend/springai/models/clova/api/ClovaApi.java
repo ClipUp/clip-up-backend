@@ -62,8 +62,8 @@ public class ClovaApi {
             throw new ClovaApiClientErrorException("Network Error");
         }
 
-        if (!(chatResponse.getBody() != null && chatResponse.getBody().status.code.equals("20000"))) {
-            throw new ClovaApiClientErrorException(chatResponse.getBody().status.toString());
+        if (!(chatResponse.getBody() != null && chatResponse.getBody().status().code().equals("20000"))) {
+            throw new ClovaApiClientErrorException(chatResponse.getBody().status().toString());
         }
 
         return chatResponse.getBody().result;
@@ -107,7 +107,7 @@ public class ClovaApi {
         @JsonProperty("stopReason") ChatCompletionFinishReason stopReason,
         @JsonProperty("inputLength") Integer inputLength,
         @JsonProperty("outputLength") Integer outputLength,
-        @JsonProperty("seed") Integer seed
+        @JsonProperty("seed") Long seed
     ) {
 
     }

@@ -1,70 +1,52 @@
 package potenday.backend.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import potenday.backend.support.ErrorCode;
+import lombok.Builder.Default;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity
-@DynamicInsert
-@DynamicUpdate
+@Document
 public class Note {
 
     private static int NOTE_TITLE_LENGTH = 40;
 
     @Id
-    private Long id;
-
+    private String id;
     private String title;
-
-    private String script;
-
+    @Default
+    private List<Dialogue> script = new ArrayList<>();
     private String audioFileUrl;
-
     private String content;
-
-    private Boolean isFinished;
-
     private Long createTime;
-
     private Long updateTime;
-
     private Boolean isDeleted;
 
-    public static Note create(Long id, Long currentTime) {
+    public static Note create(String id, List<Dialogue> script, String audioFileUrl, String content, Long currentTime) {
         return Note.builder()
             .id(id)
-            .isFinished(false)
+            .title(content.substring(0, NOTE_TITLE_LENGTH))
+            .script(script)
+            .audioFileUrl(audioFileUrl)
+            .content(content)
             .createTime(currentTime)
             .updateTime(currentTime)
             .isDeleted(false)
             .build();
     }
 
-    public Note addScript(String script) {
-        checkAlreadyFinished();
-
-        this.script += "\n" + script;
-
-        return this;
-    }
-
-    public Note finish(String audioFileUrl, String content, Long currentTime) {
-        checkAlreadyFinished();
-
-        this.title = content.substring(0, NOTE_TITLE_LENGTH);
-        this.audioFileUrl = audioFileUrl;
-        this.content = content;
-        this.isFinished = true;
-        this.createTime = currentTime;
-
-        return this;
+    public static String convertScriptToString(List<Dialogue> script) {
+        StringBuilder sb = new StringBuilder();
+        for (Dialogue dialogue : script) {
+            sb.append(dialogue.toString());
+        }
+        return sb.toString();
     }
 
     public Note update(String title, Long currentTime) {
@@ -86,12 +68,6 @@ public class Note {
         this.isDeleted = false;
 
         return this;
-    }
-
-    private void checkAlreadyFinished() {
-        if (isFinished) {
-            throw ErrorCode.ALREADY_FINISHED_NOTE.toException();
-        }
     }
 
 }

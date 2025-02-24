@@ -1,35 +1,24 @@
 package potenday.backend.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity
-@DynamicInsert
-@DynamicUpdate
+@Document
 public class LoginInfo {
 
     @Id
-    private Long id;
-
-    private Long userId;
-
-    @Enumerated(EnumType.STRING)
+    private String id;
+    private String userId;
     private LoginMethod method;
-
     private String loginKey;
-
     private String password;
 
-    public static LoginInfo create(Long id, Long userId, LoginMethod method, String loginKey) {
+    public static LoginInfo create(String id, String userId, LoginMethod method, String loginKey) {
         if (method.equals(LoginMethod.EMAIL)) {
             throw new IllegalArgumentException();
         }
@@ -42,7 +31,7 @@ public class LoginInfo {
             .build();
     }
 
-    public static LoginInfo create(Long id, Long userId, String loginKey, String password) {
+    public static LoginInfo create(String id, String userId, String loginKey, String password) {
         return LoginInfo.builder()
             .id(id)
             .userId(userId)

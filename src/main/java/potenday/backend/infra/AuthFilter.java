@@ -36,7 +36,7 @@ class AuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        Optional<Long> userId = authService.getUserId(accessToken.get());
+        Optional<String> userId = authService.getUserId(accessToken.get());
         if (userId.isEmpty()) {
             filterChain.doFilter(request, response);
             return;

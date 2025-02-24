@@ -26,7 +26,7 @@ class UserWriter {
     }
 
     @Transactional
-    User update(Long id, String email, String username) {
+    User update(String id, String email, String username) {
         User existUser = userRepository.findById(id).orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
 
         if (!existUser.getEmail().equals(email)) {

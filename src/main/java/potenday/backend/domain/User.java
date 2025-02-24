@@ -1,32 +1,24 @@
 package potenday.backend.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity
-@DynamicInsert
-@DynamicUpdate
+@Document
 public class User {
 
     @Id
-    private Long id;
-
+    private String id;
     private String email;
-
     private String username;
-
     private Long createTime;
-
     private Long updateTime;
 
-    public static User create(Long id, String email, String username, Long currentTime) {
+    public static User create(String id, String email, String username, Long currentTime) {
         return User.builder()
             .id(id)
             .email(email)

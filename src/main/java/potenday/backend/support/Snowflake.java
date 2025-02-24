@@ -1,4 +1,4 @@
-package potenday.backend.infra;
+package potenday.backend.support;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,7 @@ class Snowflake implements IdProvider {
     private long sequence = 0L;
 
     @Override
-    public synchronized long nextId() {
+    public synchronized String nextId() {
         long currentTimeMillis = System.currentTimeMillis();
 
         if (currentTimeMillis < lastTimeMillis) {
@@ -42,9 +42,9 @@ class Snowflake implements IdProvider {
 
         lastTimeMillis = currentTimeMillis;
 
-        return ((currentTimeMillis - startTimeMillis) << (NODE_ID_BITS + SEQUENCE_BITS))
+        return String.valueOf(((currentTimeMillis - startTimeMillis) << (NODE_ID_BITS + SEQUENCE_BITS))
             | (nodeId << SEQUENCE_BITS)
-            | sequence;
+            | sequence);
     }
 
     private long waitNextMillis(long currentTimestamp) {

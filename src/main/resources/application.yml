@@ -2,23 +2,37 @@ spring:
   application:
     name: backend
 
-  datasource:
-    url: ${MYSQL_URL}
-    username: ${MYSQL_USER}
-    password: ${MYSQL_PASSWORD}
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: none
+  data:
+    mongodb:
+      uri: ${MONGODB_URL}
 
   jwt:
     secret: ${JWT_SECRET}
 
   ai:
     clova:
+      base-url: https://clovastudio.stream.ntruss.com/
       api-key: ${CLOVA_API_KEY}
       chat:
         app-name: testapp
+      paragraph-split:
+        app-name: testapp
+      speech:
+        invoke-url: ${CLOVA_SPEECH_INVOKE_URL}
+        secret-key: ${CLOVA_SPEECH_SECRET_KEY}
+
+  cloud:
+    ncp:
+      storage:
+        region: kr-standard
+        endpoint: https://kr.object.ncloudstorage.com
+        access-key: ${NCP_ACCESS_KEY}
+        secret-key: ${NCP_SECRET_KEY}
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 
   profiles:
     active: local

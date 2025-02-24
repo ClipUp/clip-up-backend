@@ -5,6 +5,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import potenday.backend.domain.Dialogue;
 import potenday.backend.domain.Note;
 import potenday.backend.domain.repository.NoteRepository;
 import potenday.backend.support.ErrorCode;
@@ -15,6 +16,7 @@ import java.util.List;
 @Component
 class NoteWriter {
 
+    private static final String FOLDER_NAME = "note-audio";
     private final IdProvider idProvider;
     private final ClockProvider clockProvider;
     private final FileUploader fileUploader;
@@ -23,46 +25,24 @@ class NoteWriter {
     private final ChatClient chatClient;
     private final NoteRepository noteRepository;
 
-    Note create() {
-        Note newNote = Note.create(idProvider.nextId(), clockProvider.millis());
+    Note create(MultipartFile audioFile) {
+        String id = idProvider.nextId();
+
+        String fileName = String.format("%s.mp3", id);
+        String audioFileUrl = fileUploader.upload(audioFile, FOLDER_NAME, fileName);
+        List<Dialogue> script = sttConverter.convert(String.format("%s/%s", FOLDER_NAME, fileName));
+
+        String content = convertScriptToContent(script);
+
+        Note newNote = Note.create(id, script, audioFileUrl, content, clockProvider.millis());
         noteRepository.save(newNote);
 
         return newNote;
     }
 
-    void addScript(Long noteId, MultipartFile file) {
-        String fileName = fileUploader.upload(file);
-        String newScript = sttConverter.convert(fileName);
-
-        Note existNote = findNoteById(noteId);
-
-        Note updatedNote = existNote.addScript(newScript);
-        noteRepository.save(updatedNote);
-    }
-
     @Transactional
-    void addScript(Long noteId, String script) {
-        Note existNote = findNoteById(noteId);
-
-        Note updatedNote = existNote.addScript(script);
-        noteRepository.save(updatedNote);
-    }
-
-    Note finish(Long noteId, MultipartFile file) {
-        Note existNote = findNoteById(noteId);
-
-        String audioFileUrl = fileUploader.upload(file);
-        String content = convertScriptToContent(existNote.getScript());
-
-        Note finishedNote = existNote.finish(audioFileUrl, content, clockProvider.millis());
-        noteRepository.save(finishedNote);
-
-        return finishedNote;
-    }
-
-    @Transactional
-    Note update(Long noteId, String title) {
-        Note existNote = findNoteById(noteId);
+    Note update(String id, String title) {
+        Note existNote = findNoteById(id);
 
         Note updatedNote = existNote.update(title, clockProvider.millis());
         noteRepository.save(updatedNote);
@@ -71,8 +51,8 @@ class NoteWriter {
     }
 
     @Transactional
-    void delete(List<Long> noteIds) {
-        List<Note> existNotes = noteRepository.findAllByIdInAndIsDeleted(noteIds, false);
+    void delete(List<String> ids) {
+        List<Note> existNotes = noteRepository.findAllByIdInAndIsDeleted(ids, false);
 
         for (Note existNote : existNotes) {
             Note deletedNote = existNote.delete(clockProvider.millis());
@@ -81,8 +61,8 @@ class NoteWriter {
     }
 
     @Transactional
-    void restore(List<Long> noteIds) {
-        List<Note> deletedNotes = noteRepository.findAllByIdInAndIsDeleted(noteIds, true);
+    void restore(List<String> ids) {
+        List<Note> deletedNotes = noteRepository.findAllByIdInAndIsDeleted(ids, true);
 
         for (Note deletedNote : deletedNotes) {
             Note restoredNote = deletedNote.restore(clockProvider.millis());
@@ -90,18 +70,26 @@ class NoteWriter {
         }
     }
 
-    private Note findNoteById(Long noteId) {
-        return noteRepository.findById(noteId).orElseThrow(ErrorCode.NOTE_NOT_FOUNDED::toException);
+    private Note findNoteById(String id) {
+        return noteRepository.findById(id).orElseThrow(ErrorCode.NOTE_NOT_FOUNDED::toException);
     }
 
-    private String convertScriptToContent(String script) {
-        List<String> paragraphs = paragraphSplitter.apply(script);
+    private String convertScriptToContent(List<Dialogue> script) {
+        List<String> paragraphs = paragraphSplitter.apply(Note.convertScriptToString(script));
 
         StringBuilder sb = new StringBuilder();
         for (String paragraph : paragraphs) {
-            sb.append(chatClient.prompt().user(paragraph).call().content());
+            String note = chatClient.prompt()
+                .system("음성 녹음 파일 업로드 시 인덱스 정보가 필요함\n" +
+                    "음성 녹음 파일을 바이너리 파일 형식으로 변환하여 업로드함\n" +
+                    "녹음 파일의 순서를 확인하고, 문단 나누기를 통해 음성 녹음 파일을 음성 시각화 프로그램으로 변환함\n" +
+                    "클라이언트에서 음성 녹음 파일을 음성 회의록으로 변환 시킨다는 사실을 스크립트에 포함시킴\n" +
+                    "서버에서 음성 녹음 파일을 변환하고, 인덱스 정보를 받음\n" + "위의 예시처럼 아래의 스크립트를 기반으로 회의록을 작성해줘.")
+                .user(paragraph)
+                .call()
+                .content();
+            sb.append(note);
         }
-
         return sb.toString();
     }
 

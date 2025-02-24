@@ -1,7 +1,12 @@
 package potenday.backend.application;
 
+
+import potenday.backend.domain.Dialogue;
+
+import java.util.List;
+
 public interface STTConverter {
 
-    String convert(String fileName);
+    List<Dialogue> convert(String fileUrl);
 
 }

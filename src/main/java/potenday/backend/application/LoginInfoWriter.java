@@ -16,12 +16,12 @@ class LoginInfoWriter {
     private final EncoderProvider encoderProvider;
     private final LoginInfoRepository loginInfoRepository;
 
-    void create(Long userId, String email, String password) {
+    void create(String userId, String email, String password) {
         LoginInfo newLoginInfo = LoginInfo.create(idProvider.nextId(), userId, email, encoderProvider.encode(password));
         loginInfoRepository.save(newLoginInfo);
     }
 
-    void create(Long userId, LoginMethod method, String loginKey) {
+    void create(String userId, LoginMethod method, String loginKey) {
         if (method.equals(LoginMethod.EMAIL)) {
             throw new IllegalArgumentException();
         }
@@ -31,11 +31,11 @@ class LoginInfoWriter {
     }
 
     @Transactional
-    void update(Long userId, String originalPassword, String newPassword) {
+    void update(String userId, String originalPassword, String newPassword) {
         LoginInfo existLoginInfo = loginInfoRepository.findByUserIdAndMethod(userId, LoginMethod.EMAIL)
             .orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
 
-        if (!encoderProvider.matches(originalPassword, existLoginInfo.getPassword())) {
+        if (encoderProvider.matches(originalPassword, existLoginInfo.getPassword())) {
             throw ErrorCode.UNAUTHORIZED.toException();
         }
 

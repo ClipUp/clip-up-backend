@@ -1,6 +1,6 @@
 package potenday.backend.domain.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
@@ -8,9 +8,9 @@ import potenday.backend.domain.LoginMethod;
 import java.util.Optional;
 
 @Repository
-public interface LoginInfoRepository extends JpaRepository<LoginInfo, Long> {
+public interface LoginInfoRepository extends MongoRepository<LoginInfo, String> {
 
-    Optional<LoginInfo> findByUserIdAndMethod(Long userId, LoginMethod method);
+    Optional<LoginInfo> findByUserIdAndMethod(String userId, LoginMethod method);
 
     Optional<LoginInfo> findByMethodAndLoginKey(LoginMethod method, String loginKey);
 

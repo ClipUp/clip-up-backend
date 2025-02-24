@@ -16,12 +16,12 @@ class UserController {
     private final UserService userService;
 
     @GetMapping
-    UserResponse read(@AuthenticationPrincipal Long userId) {
+    UserResponse readUser(@AuthenticationPrincipal String userId) {
         return UserResponse.from(userService.readUser(userId));
     }
 
     @PutMapping
-    UserResponse update(@AuthenticationPrincipal Long userId, @RequestBody @Valid UserUpdateRequest request) {
+    UserResponse updateUser(@AuthenticationPrincipal String userId, @RequestBody @Valid UserUpdateRequest request) {
         return UserResponse.from(userService.updateUser(userId, request.email(), request.username()));
     }
 

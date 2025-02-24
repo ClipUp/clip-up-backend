@@ -12,7 +12,7 @@ class UserReader {
 
     private final UserRepository userRepository;
 
-    User read(Long id) {
+    User read(String id) {
         return userRepository.findById(id).orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
     }
 

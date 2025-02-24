@@ -25,7 +25,7 @@ public class AuthService {
         loginInfoWriter.create(newUser.getId(), email, password);
     }
 
-    public void updatePassword(Long userId, String originalPassword, String newPassword) {
+    public void updatePassword(String userId, String originalPassword, String newPassword) {
         loginInfoWriter.update(userId, originalPassword, newPassword);
     }
 
@@ -53,18 +53,18 @@ public class AuthService {
             throw ErrorCode.UNAUTHORIZED.toException();
         }
 
-        Long userId = tokenProcessor.getUserId(refreshToken).orElseThrow(ErrorCode.UNAUTHORIZED::toException);
+        String userId = tokenProcessor.getUserId(refreshToken).orElseThrow(ErrorCode.UNAUTHORIZED::toException);
 
         String accessToken = tokenProcessor.issueRefreshToken(userId);
 
         return new String[]{accessToken, refreshToken};
     }
 
-    public Optional<Long> getUserId(String accessToken) {
+    public Optional<String> getUserId(String accessToken) {
         return tokenProcessor.getUserId(accessToken);
     }
 
-    private String[] issueToken(Long userId) {
+    private String[] issueToken(String userId) {
         String accessToken = tokenProcessor.issueAccessToken(userId);
         String refreshToken = tokenProcessor.issueRefreshToken(userId);
 

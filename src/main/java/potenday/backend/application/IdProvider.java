@@ -2,6 +2,6 @@ package potenday.backend.application;
 
 public interface IdProvider {
 
-    long nextId();
+    String nextId();
 
 }

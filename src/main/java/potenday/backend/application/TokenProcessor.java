@@ -16,20 +16,20 @@ class TokenProcessor {
 
     private final TokenProvider tokenProvider;
 
-    String issueAccessToken(Long userId) {
-        Map<String, Object> payload = Map.of("userId", String.valueOf(userId));
+    String issueAccessToken(String userId) {
+        Map<String, Object> payload = Map.of("userId", userId);
         return tokenProvider.issueToken(payload, ACCESS_TOKEN_EXPIRES_IN);
     }
 
-    String issueRefreshToken(Long userId) {
-        Map<String, Object> payload = Map.of("userId", String.valueOf(userId));
+    String issueRefreshToken(String userId) {
+        Map<String, Object> payload = Map.of("userId", userId);
         return tokenProvider.issueToken(payload, REFRESH_TOKEN_EXPIRES_IN);
     }
 
-    Optional<Long> getUserId(String token) {
+    Optional<String> getUserId(String token) {
         try {
             Map<String, Object> payload = tokenProvider.getPayload(token);
-            return Optional.of(Long.parseLong((String) payload.get("userId")));
+            return Optional.of((String) payload.get("userId"));
         } catch (Exception ignored) {
             return Optional.empty();
         }
