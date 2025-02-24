@@ -5,12 +5,16 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
+@DynamicInsert
+@DynamicUpdate
 public class LoginInfo {
 
     @Id
@@ -50,6 +54,7 @@ public class LoginInfo {
 
     public LoginInfo update(String password) {
         this.password = password;
+
         return this;
     }
 

@@ -17,12 +17,12 @@ class UserController {
 
     @GetMapping
     UserResponse read(@AuthenticationPrincipal Long userId) {
-        return UserResponse.from(userService.read(userId));
+        return UserResponse.from(userService.readUser(userId));
     }
 
     @PutMapping
     UserResponse update(@AuthenticationPrincipal Long userId, @RequestBody @Valid UserUpdateRequest request) {
-        return UserResponse.from(userService.update(userId, request.email(), request.username()));
+        return UserResponse.from(userService.updateUser(userId, request.email(), request.username()));
     }
 
 }

@@ -3,12 +3,16 @@ package potenday.backend.domain;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
+@DynamicInsert
+@DynamicUpdate
 public class User {
 
     @Id
@@ -36,6 +40,7 @@ public class User {
         this.email = email;
         this.username = username;
         this.updateTime = currentTime;
+
         return this;
     }
 

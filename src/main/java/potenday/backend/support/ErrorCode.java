@@ -17,6 +17,10 @@ public enum ErrorCode {
     // User
     ALREADY_USED_EMAIL(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
     USER_NOT_FOUNDED(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
+
+    // Note
+    NOTE_NOT_FOUNDED(HttpStatus.NOT_FOUND, "존재하지 않는 회의록입니다."),
+    ALREADY_FINISHED_NOTE(HttpStatus.NOT_FOUND, "이미 작성을 마친 회의록입니다."),
     ;
 
     private final HttpStatus httpStatus;
