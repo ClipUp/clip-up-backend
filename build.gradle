@@ -52,6 +52,10 @@ dependencies {
     implementation 'org.springframework.ai:spring-ai-core:1.0.0-M6'
     implementation 'org.springframework.ai:spring-ai-spring-boot-autoconfigure:1.0.0-M6'
     implementation 'org.springframework.ai:spring-ai-retry:1.0.0-M6'
+
+    // Naver
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.782'
 }
 
 tasks.named('test') {
