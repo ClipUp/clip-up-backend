@@ -1,4 +1,4 @@
-package potenday.backend.support.response;
+package potenday.backend.support;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
-import potenday.backend.support.exception.ApplicationException;
-import potenday.backend.support.exception.ErrorCode;
 
 import java.util.HashMap;
 import java.util.Map;

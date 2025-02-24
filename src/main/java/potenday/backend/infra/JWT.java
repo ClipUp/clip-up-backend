@@ -1,4 +1,4 @@
-package potenday.backend.infra.provider;
+package potenday.backend.infra;
 
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;

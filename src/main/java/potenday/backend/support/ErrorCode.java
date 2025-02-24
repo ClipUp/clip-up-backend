@@ -1,4 +1,4 @@
-package potenday.backend.support.exception;
+package potenday.backend.support;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

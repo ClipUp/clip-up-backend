@@ -1,4 +1,4 @@
-package potenday.backend.infra.ai.clova.autoconfig;
+package potenday.backend.springai.autoconfig.clova;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

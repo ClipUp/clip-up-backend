@@ -1,4 +1,4 @@
-package potenday.backend.infra.ai;
+package potenday.backend.infra;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
@@ -11,5 +11,5 @@ class ChatClientConfig {
     ChatClient chatClient(ChatClient.Builder builder) {
         return builder.defaultAdvisors().build();
     }
-    
+
 }

@@ -1,4 +1,4 @@
-package potenday.backend.support.exception;
+package potenday.backend.support;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -8,7 +8,7 @@ public class ApplicationException extends RuntimeException {
 
     private final HttpStatus httpStatus;
 
-    public ApplicationException(HttpStatus httpStatus, String message) {
+    ApplicationException(HttpStatus httpStatus, String message) {
         super(message);
         this.httpStatus = httpStatus;
     }

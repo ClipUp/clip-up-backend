@@ -1,4 +1,4 @@
-package potenday.backend.infra.ai.clova.model;
+package potenday.backend.springai.models.clova;
 
 import io.micrometer.observation.ObservationRegistry;
 import lombok.Builder;
@@ -18,11 +18,11 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
-import potenday.backend.infra.ai.clova.model.api.ClovaApi;
-import potenday.backend.infra.ai.clova.model.api.ClovaApi.ChatCompletion;
-import potenday.backend.infra.ai.clova.model.api.ClovaApi.ChatCompletionMessage;
-import potenday.backend.infra.ai.clova.model.api.ClovaApi.ChatCompletionRequest;
-import potenday.backend.infra.ai.clova.model.api.common.ClovaAiApiConstants;
+import potenday.backend.springai.models.clova.api.ClovaApi;
+import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletion;
+import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletionMessage;
+import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletionRequest;
+import potenday.backend.springai.models.clova.api.common.ClovaAiApiConstants;
 
 import java.util.List;
 import java.util.Map;

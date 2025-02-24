@@ -1,4 +1,4 @@
-package potenday.backend.infra.provider;
+package potenday.backend.infra;
 
 import org.springframework.stereotype.Component;
 import potenday.backend.application.ClockProvider;

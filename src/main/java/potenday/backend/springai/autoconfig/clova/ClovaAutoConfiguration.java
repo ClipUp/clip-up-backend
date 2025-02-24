@@ -1,4 +1,4 @@
-package potenday.backend.infra.ai.clova.autoconfig;
+package potenday.backend.springai.autoconfig.clova;
 
 import io.micrometer.observation.ObservationRegistry;
 import org.springframework.ai.autoconfigure.retry.SpringAiRetryAutoConfiguration;
@@ -18,8 +18,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
-import potenday.backend.infra.ai.clova.model.ClovaChatModel;
-import potenday.backend.infra.ai.clova.model.api.ClovaApi;
+import potenday.backend.springai.models.clova.ClovaChatModel;
+import potenday.backend.springai.models.clova.api.ClovaApi;
 
 @AutoConfiguration(after = {RestClientAutoConfiguration.class, SpringAiRetryAutoConfiguration.class})
 @ConditionalOnClass(ClovaApi.class)
@@ -32,8 +32,10 @@ class ClovaAutoConfiguration {
     @ConditionalOnProperty(prefix = ClovaChatProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true", matchIfMissing = true)
     public ClovaChatModel clovaChatModel(
         ClovaConnectionProperties connectionProperties,
-        ClovaChatProperties chatProperties, ObjectProvider<RestClient.Builder> restClientBuilderProvider,
-        RetryTemplate retryTemplate, ResponseErrorHandler responseErrorHandler,
+        ClovaChatProperties chatProperties,
+        ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+        RetryTemplate retryTemplate,
+        ResponseErrorHandler responseErrorHandler,
         ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<ChatModelObservationConvention> observationConvention
     ) {
@@ -71,7 +73,10 @@ class ClovaAutoConfiguration {
     }
 
     private ResolvedConnectionProperties resolveConnectionProperties(
-        ClovaParentProperties connectionProperties, ClovaParentProperties modelProperties, String modelType) {
+        ClovaParentProperties connectionProperties,
+        ClovaParentProperties modelProperties,
+        String modelType
+    ) {
 
         String baseUrl = !StringUtils.hasText(modelProperties.getBaseUrl()) ? connectionProperties.getBaseUrl() : modelProperties.getBaseUrl();
         String apiKey = !StringUtils.hasText(modelProperties.getApiKey()) ? connectionProperties.getApiKey() : modelProperties.getApiKey();

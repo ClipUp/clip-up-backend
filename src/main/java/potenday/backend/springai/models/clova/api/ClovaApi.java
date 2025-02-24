@@ -1,4 +1,4 @@
-package potenday.backend.infra.ai.clova.model.api;
+package potenday.backend.springai.models.clova.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
-import potenday.backend.infra.ai.clova.model.api.common.ClovaApiClientErrorException;
+import potenday.backend.springai.models.clova.api.common.ClovaApiClientErrorException;
 
 import java.util.List;
 import java.util.function.Consumer;

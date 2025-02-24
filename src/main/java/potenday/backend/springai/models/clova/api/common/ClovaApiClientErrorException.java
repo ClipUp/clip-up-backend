@@ -1,4 +1,4 @@
-package potenday.backend.infra.ai.clova.model.api.common;
+package potenday.backend.springai.models.clova.api.common;
 
 public class ClovaApiClientErrorException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package potenday.backend.infra.ai.clova.model;
+package potenday.backend.springai.models.clova;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -57,7 +57,7 @@ public class ClovaChatOptions implements ChatOptions {
     @Override
     public ClovaChatOptions copy() {
         return ClovaChatOptions.builder()
-            .model(this.model)
+            .model(model)
             .temperature(this.temperature)
             .topK(this.topK)
             .topP(this.topP)

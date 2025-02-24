@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
 import potenday.backend.domain.User;
-import potenday.backend.support.exception.ErrorCode;
+import potenday.backend.support.ErrorCode;
 
 import java.util.Optional;
 

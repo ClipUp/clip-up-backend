@@ -1,10 +1,10 @@
-package potenday.backend.infra.ai.clova.autoconfig;
+package potenday.backend.springai.autoconfig.clova;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
-import potenday.backend.infra.ai.clova.model.ClovaChatOptions;
+import potenday.backend.springai.models.clova.ClovaChatOptions;
 
 @Getter
 @Setter
