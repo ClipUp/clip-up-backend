@@ -8,7 +8,7 @@ import potenday.backend.application.AudioUtil;
 import java.io.*;
 
 @Component
-public class FfmpegAudioUtil implements AudioUtil {
+class FfmpegAudioUtil implements AudioUtil {
 
     @Override
     public int getDuration(MultipartFile audioFile) {

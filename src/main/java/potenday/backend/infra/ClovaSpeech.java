@@ -22,7 +22,7 @@ class ClovaSpeech implements STTConverter {
 
     private static final String STT_URL = "/recognizer/object-storage";
     private static final String DEFAULT_BUCKET_NAME = "clip-up/";
-    private static final long CONTINUATION_THRESHOLD = 3 * 1000;
+    private static final long CONTINUATION_THRESHOLD = 500;
 
     private final RestClient restClient;
 
