@@ -22,6 +22,7 @@ class ClovaSpeech implements STTConverter {
 
     private static final String STT_URL = "/recognizer/object-storage";
     private static final String DEFAULT_BUCKET_NAME = "clip-up/";
+    private static final long CONTINUATION_THRESHOLD = 3 * 1000;
 
     private final RestClient restClient;
 
@@ -60,7 +61,7 @@ class ClovaSpeech implements STTConverter {
         for (ClovaSTTResponse.Segment segment : segments) {
             if (lastSegment == null) {
                 lastSegment = segment;
-            } else if (lastSegment.diarization.label.equals(segment.diarization.label)) {
+            } else if (isContinuation(lastSegment, segment)) {
                 lastSegment.end = segment.end;
                 lastSegment.text += " " + segment.text;
             } else {
@@ -69,6 +70,10 @@ class ClovaSpeech implements STTConverter {
             }
         }
         return dialogues;
+    }
+
+    private boolean isContinuation(ClovaSTTResponse.Segment lastSegment, ClovaSTTResponse.Segment currentSegment) {
+        return lastSegment.diarization.label.equals(currentSegment.diarization.label) && currentSegment.start - lastSegment.end <= CONTINUATION_THRESHOLD;
     }
 
     @JsonInclude(Include.NON_NULL)
