@@ -13,6 +13,7 @@ import potenday.backend.application.STTConverter;
 import potenday.backend.domain.Dialogue;
 import potenday.backend.support.ErrorCode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -20,6 +21,7 @@ import java.util.function.Consumer;
 class ClovaSpeech implements STTConverter {
 
     private static final String STT_URL = "/recognizer/object-storage";
+    private static final String DEFAULT_BUCKET_NAME = "clip-up/";
 
     private final RestClient restClient;
 
@@ -39,17 +41,34 @@ class ClovaSpeech implements STTConverter {
     }
 
     @Override
-    public List<Dialogue> convert(String fileName) {
+    public List<Dialogue> convert(String fileUrl) {
         ResponseEntity<ClovaSTTResponse> response = this.restClient.post()
             .uri(STT_URL)
-            .body(ClovaSTTRequest.of(fileName))
+            .body(ClovaSTTRequest.of(fileUrl.split(DEFAULT_BUCKET_NAME)[1]))
             .retrieve().toEntity(ClovaSTTResponse.class);
 
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             throw ErrorCode.INTERNAL_SERVER_ERROR.toException();
         }
 
-        return response.getBody().segments.stream().map(ClovaSTTResponse.Segment::toDialogue).toList();
+        return convertToScript(response.getBody().segments);
+    }
+
+    private List<Dialogue> convertToScript(List<ClovaSTTResponse.Segment> segments) {
+        List<Dialogue> dialogues = new ArrayList<>();
+        ClovaSTTResponse.Segment lastSegment = null;
+        for (ClovaSTTResponse.Segment segment : segments) {
+            if (lastSegment == null) {
+                lastSegment = segment;
+            } else if (lastSegment.diarization.label.equals(segment.diarization.label)) {
+                lastSegment.end = segment.end;
+                lastSegment.text += " " + segment.text;
+            } else {
+                dialogues.add(lastSegment.toDialogue());
+                lastSegment = null;
+            }
+        }
+        return dialogues;
     }
 
     @JsonInclude(Include.NON_NULL)
@@ -71,21 +90,26 @@ class ClovaSpeech implements STTConverter {
     ) {
 
         @JsonInclude(Include.NON_NULL)
-        record Segment(
-            @JsonProperty("start") Long start,
-            @JsonProperty("end") Long end,
-            @JsonProperty("text") String text,
-            @JsonProperty("diarization") Diarization diarization
-        ) {
+        static class Segment {
+
+            @JsonProperty("start")
+            Long start;
+            @JsonProperty("end")
+            Long end;
+            @JsonProperty("text")
+            String text;
+            @JsonProperty("diarization")
+            Diarization diarization;
 
             Dialogue toDialogue() {
                 return Dialogue.create(diarization.label, start, end, text);
             }
 
             @JsonInclude(Include.NON_NULL)
-            record Diarization(
-                @JsonProperty("label") String label
-            ) {
+            static class Diarization {
+
+                @JsonProperty("label")
+                String label;
 
             }
 

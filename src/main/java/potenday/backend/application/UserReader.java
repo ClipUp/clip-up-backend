@@ -12,6 +12,12 @@ class UserReader {
 
     private final UserRepository userRepository;
 
+    void checkExistUser(String id) {
+        if (!userRepository.existsById(id)) {
+            throw ErrorCode.MEETING_NOT_FOUNDED.toException();
+        }
+    }
+
     User read(String id) {
         return userRepository.findById(id).orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
     }

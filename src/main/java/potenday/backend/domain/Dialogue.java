@@ -1,11 +1,11 @@
 package potenday.backend.domain;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 public class Dialogue {
 
     String speaker;
@@ -14,18 +14,17 @@ public class Dialogue {
     String text;
 
     public static Dialogue create(String speaker, Long startTime, Long endTime, String test) {
-        return new Dialogue(speaker, startTime, endTime, test);
+        return Dialogue.builder()
+            .speaker(speaker)
+            .startTime(startTime)
+            .endTime(endTime)
+            .text(test)
+            .build();
     }
 
     @Override
     public String toString() {
         return String.format("%s: %s", speaker, text);
-    }
-
-    public Dialogue addTime(Long time) {
-        this.startTime += time;
-        this.endTime += time;
-        return this;
     }
 
 }
