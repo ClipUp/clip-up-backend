@@ -1,6 +1,7 @@
 package potenday.backend.infra;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import potenday.backend.application.AudioUtil;
 
@@ -22,9 +23,7 @@ public class FfmpegAudioUtil implements AudioUtil {
     @Override
     public MultipartFile convertToMp3(MultipartFile audioFile) {
         String originalFilename = audioFile.getOriginalFilename();
-        if (originalFilename == null) {
-            throw new RuntimeException("파일 이름을 확일할 수 없습니다.");
-        }
+        Assert.notNull(originalFilename, "Original filename is null");
 
         String extension = extractExtension(originalFilename);
         if (extension.equals("mp3")) {

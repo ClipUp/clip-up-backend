@@ -25,8 +25,8 @@ class STTProcessor {
 
         String audioFileUrl = fileUploader.upload(audioFile, BUCKET_NAME, fileName);
         int audioFileDuration = audioUtil.getDuration(audioFile);
-        List<Dialogue> script = sttConverter.convert(audioFileUrl);
-        return new Result(audioFileUrl, audioFileDuration, script);
+//        List<Dialogue> script = sttConverter.convert(audioFileUrl);
+        return new Result(audioFileUrl, audioFileDuration, List.of());
     }
 
     private String extractExtension(MultipartFile audioFile) {
