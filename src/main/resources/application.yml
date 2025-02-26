@@ -31,11 +31,16 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 1GB
+      max-request-size: 1GB
 
   profiles:
     active: local
+
+server:
+  tomcat:
+    max-swallow-size: -1
+    max-http-form-post-size: 1GB
 
 ---
 spring:
