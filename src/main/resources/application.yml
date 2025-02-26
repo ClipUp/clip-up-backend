@@ -43,7 +43,7 @@ server:
   tomcat:
     max-swallow-size: -1
     max-http-form-post-size: 1GB
-    connection-timeout: 10000
+    connection-timeout: 300000
 
 ---
 spring:
