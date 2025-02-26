@@ -18,7 +18,6 @@ class MeetingWriter {
     private final IdProvider idProvider;
     private final ClockProvider clockProvider;
     private final MeetingRepository meetingRepository;
-    private final AudioUtil audioUtil;
     private final STTProcessor sttProcessor;
     private final MinutesProcessor minutesProcessor;
 

@@ -15,8 +15,6 @@ spring:
       api-key: ${CLOVA_API_KEY}
       chat:
         app-name: testapp
-      paragraph-split:
-        app-name: testapp
       speech:
         invoke-url: ${CLOVA_SPEECH_INVOKE_URL}
         secret-key: ${CLOVA_SPEECH_SECRET_KEY}
@@ -33,6 +31,10 @@ spring:
     multipart:
       max-file-size: 1GB
       max-request-size: 1GB
+
+  threads:
+    virtual:
+      enabled: true
 
   profiles:
     active: local

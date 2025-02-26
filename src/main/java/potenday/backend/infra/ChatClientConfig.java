@@ -9,7 +9,7 @@ class ChatClientConfig {
 
     @Bean
     ChatClient chatClient(ChatClient.Builder builder) {
-        return builder.defaultAdvisors().build();
+        return builder.build();
     }
 
 }
