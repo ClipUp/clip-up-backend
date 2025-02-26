@@ -45,7 +45,7 @@ public class Meeting {
             .audioFileDuration(audioFileDuration)
             .script(script)
             .minutes(minutes)
-            .title("test")
+            .title(minutes.substring(0, DEFAULT_TITLE_LENGTH))
             .createTime(currentTime)
             .updateTime(currentTime)
             .isDeleted(false)
