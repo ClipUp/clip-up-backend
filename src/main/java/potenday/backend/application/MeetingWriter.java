@@ -8,7 +8,6 @@ import potenday.backend.domain.Meeting;
 import potenday.backend.domain.repository.MeetingRepository;
 import potenday.backend.support.ErrorCode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -36,37 +35,32 @@ class MeetingWriter {
     @Transactional
     Meeting update(String id, String userId, String title) {
         Meeting existMeeting = findMeetingById(id);
-
         Meeting updatedMeeting = existMeeting.update(userId, title, clockProvider.millis());
-        meetingRepository.save(updatedMeeting);
-
+        meetingRepository.save(existMeeting);
         return updatedMeeting;
     }
 
     @Transactional
     void delete(String userId, List<String> ids) {
-        List<Meeting> existMeetings = meetingRepository.findAllByIdInAndOwnerIdAndIsDeleted(ids, userId, false);
-
-        List<Meeting> deletedMeetings = new ArrayList<>();
-        for (Meeting existMeeting : existMeetings) {
-            deletedMeetings.add(existMeeting.delete(userId, clockProvider.millis()));
-        }
-        meetingRepository.saveAll(deletedMeetings);
+        List<Meeting> meetings = meetingRepository.findAllByIdInAndOwnerIdAndIsDeleted(ids, userId, false)
+            .stream()
+            .map(meeting -> meeting.delete(userId, clockProvider.millis()))
+            .toList();
+        meetingRepository.saveAll(meetings);
     }
 
     @Transactional
     void restore(String userId, List<String> ids) {
-        List<Meeting> deletedMeetings = meetingRepository.findAllByIdInAndOwnerIdAndIsDeleted(ids, userId, true);
-
-        List<Meeting> restoredMeetings = new ArrayList<>();
-        for (Meeting deletedMeeting : deletedMeetings) {
-            restoredMeetings.add(deletedMeeting.restore(userId, clockProvider.millis()));
-        }
-        meetingRepository.saveAll(restoredMeetings);
+        List<Meeting> meetings = meetingRepository.findAllByIdInAndOwnerIdAndIsDeleted(ids, userId, true)
+            .stream()
+            .map(meeting -> meeting.restore(userId, clockProvider.millis()))
+            .toList();
+        meetingRepository.saveAll(meetings);
     }
 
     private Meeting findMeetingById(String id) {
-        return meetingRepository.findById(id).orElseThrow(ErrorCode.MEETING_NOT_FOUNDED::toException);
+        return meetingRepository.findById(id)
+            .orElseThrow(ErrorCode.MEETING_NOT_FOUNDED::toException);
     }
 
 }

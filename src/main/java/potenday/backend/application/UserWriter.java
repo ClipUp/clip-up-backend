@@ -17,7 +17,7 @@ class UserWriter {
 
     @Transactional
     User create(String email, String username) {
-        checkAlreadyUsedEmail(email);
+        validateAlreadyUsedEmail(email);
 
         User newUser = User.create(idProvider.nextId(), email, username, clockProvider.millis());
         userRepository.save(newUser);
@@ -30,7 +30,7 @@ class UserWriter {
         User existUser = userRepository.findById(id).orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
 
         if (!existUser.getEmail().equals(email)) {
-            checkAlreadyUsedEmail(email);
+            validateAlreadyUsedEmail(email);
         }
 
         User updatedUser = existUser.update(email, username, clockProvider.millis());
@@ -39,7 +39,7 @@ class UserWriter {
         return updatedUser;
     }
 
-    private void checkAlreadyUsedEmail(String email) {
+    private void validateAlreadyUsedEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             throw ErrorCode.ALREADY_USED_EMAIL.toException();
         }

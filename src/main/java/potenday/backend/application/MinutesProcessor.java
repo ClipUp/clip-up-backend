@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import potenday.backend.domain.Dialogue;
 import potenday.backend.springai.models.clova.ClovaChatOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -26,57 +26,50 @@ class MinutesProcessor {
     private static final int MIN_CHUNK_LENGTH_TO_EMBED = 5;
     private static final int MAX_NUM_CHUNKS = 15;
     private static final boolean KEEP_SEPARATOR = true;
-
     private static final int MAX_TOKENS = 4096;
 
+    private static final int THREAD_POOL_SIZE = 5;
+    private static final int BATCH_SIZE = 5;
+    private static final long WAIT_TIME_MINUTES = 1;
+
     private final ChatClient chatClient;
-    private final TextSplitter textSplitter = new TokenTextSplitter(DEFAULT_CHUNK_SIZE, MIN_CHUNK_SIZE_CHARS, MIN_CHUNK_LENGTH_TO_EMBED, MAX_NUM_CHUNKS, KEEP_SEPARATOR);
+    private final TextSplitter textSplitter = new TokenTextSplitter(
+        DEFAULT_CHUNK_SIZE, MIN_CHUNK_SIZE_CHARS, MIN_CHUNK_LENGTH_TO_EMBED, MAX_NUM_CHUNKS, KEEP_SEPARATOR
+    );
 
     String generate(List<Dialogue> script) {
-        String strScript = convertScriptToString(script);
-
-        Document document = new Document(strScript);
-        List<Document> documents = textSplitter.split(document);
-
-        return process(documents);
+        List<Document> documents = splitScript(script);
+        return processInBatches(documents);
     }
 
-    private String process(List<Document> documents) {
-        ChatOptions chatOptions = ClovaChatOptions.builder().maxTokens(4096).build();
+    private List<Document> splitScript(List<Dialogue> script) {
+        String strScript = script.stream()
+            .map(Dialogue::toString)
+            .collect(Collectors.joining("\n"));
+        return textSplitter.split(new Document(strScript));
+    }
+
+    private String processInBatches(List<Document> documents) {
+        ChatOptions chatOptions = ClovaChatOptions.builder().maxTokens(MAX_TOKENS).build();
         StringBuilder sb = new StringBuilder();
-        ExecutorService executor = Executors.newFixedThreadPool(5); // 최대 5개 병렬 실행
-        int batchSize = 5;
 
-        List<List<Document>> batches = new ArrayList<>();
-        for (int i = 0; i < documents.size(); i += batchSize) {
-            batches.add(documents.subList(i, Math.min(i + batchSize, documents.size())));
-        }
+        try (ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE)) {
+            for (int i = 0; i < documents.size(); i += BATCH_SIZE) {
+                List<Document> batch = documents.subList(i, Math.min(i + BATCH_SIZE, documents.size()));
 
-        for (List<Document> batch : batches) {
-            // 비동기 실행
-            List<CompletableFuture<String>> futures = batch.stream()
-                .map(doc -> CompletableFuture.supplyAsync(() ->
-                    chatClient.prompt()
-                        .options(chatOptions)
-                        .user(doc.getText())
-                        .call()
-                        .content(), executor))
-                .toList();
+                List<CompletableFuture<String>> futures = batch.stream()
+                    .map(doc -> CompletableFuture.supplyAsync(
+                        () -> chatClient.prompt().options(chatOptions).user(doc.getText()).call().content(), executor)
+                    )
+                    .toList();
 
-            // 모든 Future가 완료될 때까지 대기하고 결과 취합
-            List<String> results = futures.stream()
-                .map(CompletableFuture::join)
-                .toList();
+                futures.stream()
+                    .map(CompletableFuture::join)
+                    .forEach(result -> sb.append(result).append("\n"));
 
-            results.forEach(result -> sb.append(result).append("\n"));
-
-            // 마지막 batch가 아닐 경우 1분 대기
-            if (batch != batches.get(batches.size() - 1)) {
-                try {
-                    TimeUnit.MINUTES.sleep(1);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("Thread was interrupted", e);
+                // 마지막 batch가 아닐 경우 1분 대기
+                if (i + BATCH_SIZE < documents.size()) {
+                    waitForNextBatch();
                 }
             }
         }
@@ -84,12 +77,13 @@ class MinutesProcessor {
         return sb.toString();
     }
 
-    private String convertScriptToString(List<Dialogue> script) {
-        StringBuilder sb = new StringBuilder();
-        for (Dialogue dialogue : script) {
-            sb.append(dialogue.toString()).append("\n");
+    private void waitForNextBatch() {
+        try {
+            TimeUnit.MINUTES.sleep(WAIT_TIME_MINUTES);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread was interrupted", e);
         }
-        return sb.toString();
     }
 
 }

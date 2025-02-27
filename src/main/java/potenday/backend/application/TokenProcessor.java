@@ -11,27 +11,43 @@ import java.util.Optional;
 @Component
 class TokenProcessor {
 
-    private static final Duration ACCESS_TOKEN_EXPIRES_IN = Duration.ofHours(1);
-    private static final Duration REFRESH_TOKEN_EXPIRES_IN = Duration.ofDays(7);
-
     private final TokenProvider tokenProvider;
 
     String issueAccessToken(String userId) {
-        Map<String, Object> payload = Map.of("userId", userId);
-        return tokenProvider.issueToken(payload, ACCESS_TOKEN_EXPIRES_IN);
+        return issueToken(userId, TokenType.ACCESS);
     }
 
     String issueRefreshToken(String userId) {
-        Map<String, Object> payload = Map.of("userId", userId);
-        return tokenProvider.issueToken(payload, REFRESH_TOKEN_EXPIRES_IN);
+        return issueToken(userId, TokenType.REFRESH);
     }
 
     Optional<String> getUserId(String token) {
         try {
             Map<String, Object> payload = tokenProvider.getPayload(token);
-            return Optional.of((String) payload.get("userId"));
+            Object userId = payload.get("userId");
+            return (userId instanceof String) ? Optional.of((String) userId) : Optional.empty();
         } catch (Exception ignored) {
             return Optional.empty();
+        }
+    }
+
+    private String issueToken(String userId, TokenType tokenType) {
+        Map<String, Object> payload = Map.of("userId", userId);
+        return tokenProvider.issueToken(payload, tokenType.getExpiration());
+    }
+
+    private enum TokenType {
+        ACCESS(Duration.ofHours(1)),
+        REFRESH(Duration.ofDays(7));
+
+        private final Duration expiration;
+
+        TokenType(Duration expiration) {
+            this.expiration = expiration;
+        }
+
+        Duration getExpiration() {
+            return expiration;
         }
     }
 

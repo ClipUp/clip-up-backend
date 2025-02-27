@@ -1,7 +1,6 @@
 package potenday.backend.infra;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -27,74 +26,85 @@ class ClovaSpeech implements STTConverter {
     private final RestClient restClient;
 
     ClovaSpeech(
-        @Value("${spring.ai.clova.speech.invoke-url}")
-        String invokeUrl,
+        @Value("${spring.ai.clova.speech.invoke-url}") String invokeUrl,
         @Value("${spring.ai.clova.speech.secret-key}") String secretKey,
         RestClient.Builder restClientBuilder
     ) {
-        Consumer<HttpHeaders> finalHeaders = h -> {
-            h.set("X-CLOVASPEECH-API-KEY", secretKey);
-            h.setContentType(MediaType.APPLICATION_JSON);
-        };
         this.restClient = restClientBuilder.baseUrl(invokeUrl)
-            .defaultHeaders(finalHeaders)
+            .defaultHeaders(createHeaders(secretKey))
             .build();
     }
 
     @Override
     public List<Dialogue> convert(String fileUrl) {
+        String fileName = extractFileName(fileUrl);
+        ClovaSTTRequest request = new ClovaSTTRequest(fileName, "ko-KR", "sync");
+
         ResponseEntity<ClovaSTTResponse> response = this.restClient.post()
             .uri(STT_URL)
-            .body(ClovaSTTRequest.of(fileUrl.split(DEFAULT_BUCKET_NAME)[1]))
-            .retrieve().toEntity(ClovaSTTResponse.class);
+            .body(request)
+            .retrieve()
+            .toEntity(ClovaSTTResponse.class);
 
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             throw ErrorCode.INTERNAL_SERVER_ERROR.toException();
         }
 
-        return convertToScript(response.getBody().segments);
+        return convertToDialogues(response.getBody().segments);
     }
 
-    private List<Dialogue> convertToScript(List<ClovaSTTResponse.Segment> segments) {
+    private List<Dialogue> convertToDialogues(List<ClovaSTTResponse.Segment> segments) {
         List<Dialogue> dialogues = new ArrayList<>();
-        ClovaSTTResponse.Segment lastSegment = null;
-        for (ClovaSTTResponse.Segment segment : segments) {
-            if (lastSegment == null) {
-                lastSegment = segment;
-            } else if (isContinuation(lastSegment, segment)) {
-                lastSegment.end = segment.end;
-                lastSegment.text += " " + segment.text;
+        if (segments.isEmpty()) return dialogues;
+
+        ClovaSTTResponse.Segment lastSegment = segments.get(0);
+
+        for (int i = 1; i < segments.size(); i++) {
+            ClovaSTTResponse.Segment currentSegment = segments.get(i);
+
+            if (isContinuation(lastSegment, currentSegment)) {
+                lastSegment.mergeWith(currentSegment);
             } else {
                 dialogues.add(lastSegment.toDialogue());
-                lastSegment = null;
+                lastSegment = currentSegment;
             }
         }
+
+        dialogues.add(lastSegment.toDialogue()); // 마지막 대화 추가
         return dialogues;
     }
 
-    private boolean isContinuation(ClovaSTTResponse.Segment lastSegment, ClovaSTTResponse.Segment currentSegment) {
-        return lastSegment.diarization.label.equals(currentSegment.diarization.label) && currentSegment.start - lastSegment.end <= CONTINUATION_THRESHOLD;
+    private boolean isContinuation(ClovaSTTResponse.Segment last, ClovaSTTResponse.Segment current) {
+        return last.hasSameSpeaker(current) && current.start - last.end <= CONTINUATION_THRESHOLD;
     }
 
-    @JsonInclude(Include.NON_NULL)
+    private String extractFileName(String fileUrl) {
+        if (!fileUrl.contains(DEFAULT_BUCKET_NAME)) {
+            throw new IllegalArgumentException("Invalid file URL format: " + fileUrl);
+        }
+        return fileUrl.split(DEFAULT_BUCKET_NAME)[1];
+    }
+
+    private Consumer<HttpHeaders> createHeaders(String secretKey) {
+        return headers -> {
+            headers.set("X-CLOVASPEECH-API-KEY", secretKey);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+        };
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private record ClovaSTTRequest(
         @JsonProperty("dataKey") String dataKey,
         @JsonProperty("language") String language,
         @JsonProperty("completion") String completion
     ) {
 
-        static ClovaSTTRequest of(String fileName) {
-            return new ClovaSTTRequest(fileName, "ko-KR", "sync");
-        }
-
     }
 
-    @JsonInclude(Include.NON_NULL)
-    private record ClovaSTTResponse(
-        @JsonProperty("segments") List<Segment> segments
-    ) {
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private record ClovaSTTResponse(@JsonProperty("segments") List<Segment> segments) {
 
-        @JsonInclude(Include.NON_NULL)
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         static class Segment {
 
             @JsonProperty("start")
@@ -110,7 +120,16 @@ class ClovaSpeech implements STTConverter {
                 return Dialogue.create(diarization.label, start, end, text);
             }
 
-            @JsonInclude(Include.NON_NULL)
+            boolean hasSameSpeaker(Segment other) {
+                return diarization.label.equals(other.diarization.label);
+            }
+
+            void mergeWith(Segment other) {
+                this.end = other.end;
+                this.text += " " + other.text;
+            }
+
+            @JsonInclude(JsonInclude.Include.NON_NULL)
             static class Diarization {
 
                 @JsonProperty("label")
@@ -121,6 +140,5 @@ class ClovaSpeech implements STTConverter {
         }
 
     }
-
 
 }

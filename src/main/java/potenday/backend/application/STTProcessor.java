@@ -19,29 +19,32 @@ class STTProcessor {
     private final STTConverter sttConverter;
 
     Result convert(String id, MultipartFile audioFile) {
-        audioFile = audioUtil.convertToMp3(audioFile);
-
-        String fileName = String.format("%s.%s", id, extractExtension(audioFile));
-
-        String audioFileUrl = fileUploader.upload(audioFile, BUCKET_NAME, fileName);
-        int audioFileDuration = audioUtil.getDuration(audioFile);
+        AudioUtil.Result result = audioUtil.convertToMp3(audioFile);
+        String audioFileUrl = uploadFile(id, result.mp3File());
         List<Dialogue> script = sttConverter.convert(audioFileUrl);
-        return new Result(audioFileUrl, audioFileDuration, script);
+
+        return new Result(audioFileUrl, result.fileDuration(), script);
+    }
+
+    private String uploadFile(String id, MultipartFile audioFile) {
+        String extension = extractExtension(audioFile);
+        String fileName = String.format("%s.%s", id, extension);
+        return fileUploader.upload(audioFile, BUCKET_NAME, fileName);
     }
 
     private String extractExtension(MultipartFile audioFile) {
         String originalFilename = audioFile.getOriginalFilename();
-
         Assert.notNull(originalFilename, "Original filename is null");
 
-        return originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+        int lastDotIndex = originalFilename.lastIndexOf(".");
+        if (lastDotIndex == -1 || lastDotIndex == originalFilename.length() - 1) {
+            throw new IllegalArgumentException("Invalid file extension");
+        }
+
+        return originalFilename.substring(lastDotIndex + 1).toLowerCase();
     }
 
-    record Result(
-        String audioFileUrl,
-        int audioFileDuration,
-        List<Dialogue> script
-    ) {
+    record Result(String audioFileUrl, int audioFileDuration, List<Dialogue> script) {
 
     }
 
