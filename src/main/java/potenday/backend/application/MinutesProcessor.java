@@ -6,17 +6,16 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import potenday.backend.domain.Dialogue;
 import potenday.backend.springai.models.clova.ClovaChatOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Component
@@ -32,13 +31,6 @@ class MinutesProcessor {
 
     private final ChatClient chatClient;
     private final TextSplitter textSplitter = new TokenTextSplitter(DEFAULT_CHUNK_SIZE, MIN_CHUNK_SIZE_CHARS, MIN_CHUNK_LENGTH_TO_EMBED, MAX_NUM_CHUNKS, KEEP_SEPARATOR);
-    private final ChatOptions chatOptions = ClovaChatOptions.builder().maxTokens(4096).build();
-
-    @Value("classpath:/prompts/draft-minutes-message.st")
-    private Resource draftMinutesSystemMessageTemplate;
-    @Value("classpath:/prompts/minutes-message.st")
-    private Resource minutesSystemMessageTemplate;
-
 
     String generate(List<Dialogue> script) {
         String strScript = convertScriptToString(script);
@@ -46,33 +38,50 @@ class MinutesProcessor {
         Document document = new Document(strScript);
         List<Document> documents = textSplitter.split(document);
 
-        return generateDraft(documents);
-//        return chatClient.prompt()
-//            .system(minutesSystemMessageTemplate)
-//            .options(chatOptions)
-//            .user(draft)
-//            .call()
-//            .content();
+        return process(documents);
     }
 
-    private String generateDraft(List<Document> documents) {
-        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            List<CompletableFuture<String>> futures = documents.stream()
-                .map(d -> CompletableFuture.supplyAsync(() ->
+    private String process(List<Document> documents) {
+        ChatOptions chatOptions = ClovaChatOptions.builder().maxTokens(4096).build();
+        StringBuilder sb = new StringBuilder();
+        ExecutorService executor = Executors.newFixedThreadPool(5); // 최대 5개 병렬 실행
+        int batchSize = 5;
+
+        List<List<Document>> batches = new ArrayList<>();
+        for (int i = 0; i < documents.size(); i += batchSize) {
+            batches.add(documents.subList(i, Math.min(i + batchSize, documents.size())));
+        }
+
+        for (List<Document> batch : batches) {
+            // 비동기 실행
+            List<CompletableFuture<String>> futures = batch.stream()
+                .map(doc -> CompletableFuture.supplyAsync(() ->
                     chatClient.prompt()
-                        .system(draftMinutesSystemMessageTemplate)
                         .options(chatOptions)
-                        .user(d.getText())
+                        .user(doc.getText())
                         .call()
                         .content(), executor))
                 .toList();
 
-            List<String> responses = futures.stream()
+            // 모든 Future가 완료될 때까지 대기하고 결과 취합
+            List<String> results = futures.stream()
                 .map(CompletableFuture::join)
-                .collect(Collectors.toList());
+                .toList();
 
-            return String.join("\n", responses);
+            results.forEach(result -> sb.append(result).append("\n"));
+
+            // 마지막 batch가 아닐 경우 1분 대기
+            if (batch != batches.get(batches.size() - 1)) {
+                try {
+                    TimeUnit.MINUTES.sleep(1);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Thread was interrupted", e);
+                }
+            }
         }
+
+        return sb.toString();
     }
 
     private String convertScriptToString(List<Dialogue> script) {
