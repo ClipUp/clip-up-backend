@@ -1,3 +1,5 @@
+CREATE SCHEMA clip_up;
+
 CREATE TABLE clip_up.service_user
 (
     id          VARCHAR(255) PRIMARY KEY,

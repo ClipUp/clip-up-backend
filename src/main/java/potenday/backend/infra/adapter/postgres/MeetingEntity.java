@@ -3,6 +3,7 @@ package potenday.backend.infra.adapter.postgres;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,8 @@ import java.util.List;
 @Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "meeting")
+@Entity
+@Table(schema = "clip_up", name = "meeting")
 class MeetingEntity {
 
     @Id
@@ -42,6 +44,7 @@ class MeetingEntity {
             .minutes(meeting.minutes())
             .createTime(meeting.createTime())
             .updateTime(meeting.updateTime())
+            .isDeleted(meeting.isDeleted())
             .build();
     }
 
@@ -56,6 +59,7 @@ class MeetingEntity {
             .minutes(minutes)
             .createTime(createTime)
             .updateTime(updateTime)
+            .isDeleted(isDeleted)
             .build();
     }
 

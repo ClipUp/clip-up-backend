@@ -2,6 +2,7 @@ package potenday.backend.infra.adapter.postgres;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,8 @@ import potenday.backend.domain.User;
 @Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "service_user")
+@Entity
+@Table(schema = "clip_up", name = "service_user")
 class UserEntity {
 
     @Id

@@ -1,9 +1,6 @@
 package potenday.backend.infra.adapter.postgres;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +11,8 @@ import potenday.backend.domain.LoginMethod;
 @Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Entity(name = "login_info")
+@Entity
+@Table(schema = "clip_up", name = "login_info")
 class LoginInfoEntity {
 
     @Id

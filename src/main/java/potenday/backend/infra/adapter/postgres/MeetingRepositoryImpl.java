@@ -44,7 +44,7 @@ class MeetingRepositoryImpl implements MeetingRepository {
         String lastId,
         Integer limit
     ) {
-        List<MeetingEntity> meetings = lastId == null ? meetingEntityRepository.findByOwnerIdAndIsDeletedAndId(ownerId, isDeleted, limit) : meetingEntityRepository.findByOwnerIdAndIsDeletedAndIdGreaterThan(ownerId, isDeleted, limit, lastId);
+        List<MeetingEntity> meetings = lastId == null ? meetingEntityRepository.findAllByOwnerIdAndIsDeleted(ownerId, isDeleted, limit) : meetingEntityRepository.findAllByOwnerIdAndIsDeletedAndIdGreaterThan(ownerId, isDeleted, limit, lastId);
 
         return meetings.stream()
             .map(MeetingEntity::toMeeting)
