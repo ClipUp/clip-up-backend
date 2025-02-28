@@ -46,6 +46,12 @@ class AuthController {
             .body(TokenResponse.of(tokens[0]));
     }
 
+    @PostMapping("/logout")
+    ResponseEntity<Void> logout() {
+        return ResponseEntity.status(HttpStatus.OK)
+            .header(HttpHeaders.SET_COOKIE, removeRefreshTokenCookie()).build();
+    }
+
     @PostMapping("/token")
     ResponseEntity<TokenResponse> login(@CookieValue(value = REFRESH_TOKEN_KEY, required = false) String refreshToken) {
         String[] tokens = authService.reissueToken(refreshToken);
@@ -61,6 +67,17 @@ class AuthController {
             .sameSite("None")
             .path("/")
             .maxAge(REFRESH_TOKEN_EXPIRES_IN)
+            .build()
+            .toString();
+    }
+
+    private String removeRefreshTokenCookie() {
+        return ResponseCookie.from(REFRESH_TOKEN_KEY, "")
+            .httpOnly(true)
+            .secure(true)
+            .sameSite("None")
+            .path("/")
+            .maxAge(-1)
             .build()
             .toString();
     }
