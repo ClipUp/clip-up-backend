@@ -38,7 +38,7 @@ class MeetingWriter {
     Meeting update(String id, String userId, String title) {
         Meeting existMeeting = findMeetingById(id);
         Meeting updatedMeeting = existMeeting.update(userId, title, clockProvider.millis());
-        meetingRepository.save(existMeeting);
+        meetingRepository.save(updatedMeeting);
         return updatedMeeting;
     }
 
