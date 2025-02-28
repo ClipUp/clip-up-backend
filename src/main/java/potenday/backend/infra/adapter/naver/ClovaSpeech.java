@@ -1,4 +1,4 @@
-package potenday.backend.infra.provider;
+package potenday.backend.infra.adapter.naver;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import potenday.backend.application.STTConverter;
+import potenday.backend.application.port.STTConverter;
 import potenday.backend.domain.Dialogue;
 import potenday.backend.support.exception.ErrorCode;
 

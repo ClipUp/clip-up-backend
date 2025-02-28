@@ -1,9 +1,9 @@
-package potenday.backend.infra.provider;
+package potenday.backend.infra.adapter;
 
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import potenday.backend.application.TokenProvider;
+import potenday.backend.application.port.TokenProvider;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;

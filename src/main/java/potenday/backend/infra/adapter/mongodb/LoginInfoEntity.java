@@ -1,4 +1,4 @@
-package potenday.backend.infra.repository;
+package potenday.backend.infra.adapter.mongodb;
 
 import lombok.AccessLevel;
 import lombok.Builder;

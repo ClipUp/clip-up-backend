@@ -1,8 +1,8 @@
-package potenday.backend.infra.repository;
+package potenday.backend.infra.adapter.mongodb;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import potenday.backend.application.UserRepository;
+import potenday.backend.application.port.UserRepository;
 import potenday.backend.domain.User;
 
 import java.util.Optional;

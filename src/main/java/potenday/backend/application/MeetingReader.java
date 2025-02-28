@@ -2,6 +2,7 @@ package potenday.backend.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import potenday.backend.application.port.MeetingRepository;
 import potenday.backend.domain.Meeting;
 import potenday.backend.support.exception.ErrorCode;
 

@@ -2,6 +2,8 @@ package potenday.backend.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import potenday.backend.application.port.EncoderProvider;
+import potenday.backend.application.port.LoginInfoRepository;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
 import potenday.backend.support.exception.ErrorCode;

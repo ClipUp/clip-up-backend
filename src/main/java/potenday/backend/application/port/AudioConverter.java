@@ -1,8 +1,8 @@
-package potenday.backend.application;
+package potenday.backend.application.port;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public interface AudioUtil {
+public interface AudioConverter {
 
     Result convertToMp3(MultipartFile audioFile);
 

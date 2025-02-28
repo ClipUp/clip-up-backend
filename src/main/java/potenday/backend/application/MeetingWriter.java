@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import potenday.backend.application.port.ClockProvider;
+import potenday.backend.application.port.IdProvider;
+import potenday.backend.application.port.MeetingRepository;
 import potenday.backend.domain.Meeting;
 import potenday.backend.support.exception.ErrorCode;
 

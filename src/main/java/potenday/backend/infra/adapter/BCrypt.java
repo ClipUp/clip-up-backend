@@ -1,11 +1,11 @@
-package potenday.backend.infra.provider;
+package potenday.backend.infra.adapter;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import potenday.backend.application.EncoderProvider;
+import potenday.backend.application.port.EncoderProvider;
 
 @Component
-public class BCryptEncoder implements EncoderProvider {
+public class BCrypt implements EncoderProvider {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 

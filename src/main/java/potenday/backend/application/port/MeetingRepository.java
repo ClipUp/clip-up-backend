@@ -1,4 +1,4 @@
-package potenday.backend.application;
+package potenday.backend.application.port;
 
 import org.springframework.stereotype.Repository;
 import potenday.backend.domain.Meeting;

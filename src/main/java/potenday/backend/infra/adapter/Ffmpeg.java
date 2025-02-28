@@ -1,15 +1,15 @@
-package potenday.backend.infra.provider;
+package potenday.backend.infra.adapter;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
-import potenday.backend.application.AudioUtil;
+import potenday.backend.application.port.AudioConverter;
 
 import java.io.*;
 import java.nio.file.Files;
 
 @Component
-class FfmpegAudioUtil implements AudioUtil {
+class Ffmpeg implements AudioConverter {
 
     @Override
     public Result convertToMp3(MultipartFile audioFile) {

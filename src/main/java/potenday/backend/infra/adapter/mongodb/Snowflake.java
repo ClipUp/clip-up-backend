@@ -1,8 +1,8 @@
-package potenday.backend.infra.provider;
+package potenday.backend.infra.adapter.mongodb;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import potenday.backend.application.IdProvider;
+import potenday.backend.application.port.IdProvider;
 
 import java.util.random.RandomGenerator;
 

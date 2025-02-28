@@ -1,4 +1,4 @@
-package potenday.backend.infra.provider;
+package potenday.backend.infra.adapter.naver;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -7,14 +7,14 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import potenday.backend.application.FileUploader;
+import potenday.backend.application.port.FileUploader;
 import potenday.backend.support.exception.ErrorCode;
 
 import java.io.IOException;
 
 @RequiredArgsConstructor
 @Component
-class NCPFileUploader implements FileUploader {
+class ObjectStorage implements FileUploader {
 
     private static final String DEFAULT_BUCKET_NAME = "clip-up";
 

@@ -1,4 +1,4 @@
-package potenday.backend.infra.repository;
+package potenday.backend.infra.adapter.mongodb;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
-import potenday.backend.application.MeetingRepository;
+import potenday.backend.application.port.MeetingRepository;
 import potenday.backend.domain.Meeting;
 
 import java.util.List;

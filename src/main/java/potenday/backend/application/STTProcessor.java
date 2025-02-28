@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
+import potenday.backend.application.port.AudioConverter;
+import potenday.backend.application.port.FileUploader;
+import potenday.backend.application.port.STTConverter;
 import potenday.backend.domain.Dialogue;
 
 import java.util.List;
@@ -14,12 +17,12 @@ class STTProcessor {
 
     private static final String BUCKET_NAME = "meeting-audio";
 
-    private final AudioUtil audioUtil;
+    private final AudioConverter audioUtil;
     private final FileUploader fileUploader;
     private final STTConverter sttConverter;
 
     Result convert(String id, MultipartFile audioFile) {
-        AudioUtil.Result result = audioUtil.convertToMp3(audioFile);
+        AudioConverter.Result result = audioUtil.convertToMp3(audioFile);
         String audioFileUrl = uploadFile(id, result.mp3File());
         List<Dialogue> script = sttConverter.convert(audioFileUrl);
 
