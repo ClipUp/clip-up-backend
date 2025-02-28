@@ -16,7 +16,7 @@ public class BCrypt implements EncoderProvider {
 
     @Override
     public boolean matches(String text, String encodedText) {
-        return !bCryptPasswordEncoder.matches(text, encodedText);
+        return bCryptPasswordEncoder.matches(text, encodedText);
     }
 
 }

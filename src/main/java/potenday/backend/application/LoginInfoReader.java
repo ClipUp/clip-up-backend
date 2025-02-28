@@ -21,7 +21,7 @@ class LoginInfoReader {
         LoginInfo existLoginInfo = loginInfoRepository.findByMethodAndLoginKey(LoginMethod.EMAIL, email)
             .orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
 
-        if (encoderProvider.matches(password, existLoginInfo.password())) {
+        if (!encoderProvider.matches(password, existLoginInfo.password())) {
             throw ErrorCode.UNAUTHORIZED.toException();
         }
 
