@@ -8,7 +8,7 @@ import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
 
 @Builder(access = AccessLevel.PRIVATE)
-@Document(collation = "loginInfo")
+@Document(collection = "loginInfo")
 class LoginInfoEntity {
 
     @Id

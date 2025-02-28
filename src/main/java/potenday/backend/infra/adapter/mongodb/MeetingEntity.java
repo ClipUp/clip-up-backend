@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Builder(access = AccessLevel.PRIVATE)
-@Document(collation = "meeting")
+@Document(collection = "meeting")
 class MeetingEntity {
 
     @Id

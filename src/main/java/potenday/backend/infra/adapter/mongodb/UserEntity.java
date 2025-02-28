@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import potenday.backend.domain.User;
 
 @Builder(access = AccessLevel.PRIVATE)
-@Document(collation = "user")
+@Document(collection = "user")
 class UserEntity {
 
     @Id
