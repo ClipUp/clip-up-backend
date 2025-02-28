@@ -68,4 +68,8 @@ public record Meeting(
         }
     }
 
+    public Meeting updateMinutes(String minutes) {
+        return this.toBuilder().minutes(minutes).build();
+    }
+
 }

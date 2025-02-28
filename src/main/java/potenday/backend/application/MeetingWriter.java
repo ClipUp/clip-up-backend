@@ -65,4 +65,11 @@ class MeetingWriter {
             .orElseThrow(ErrorCode.MEETING_NOT_FOUNDED::toException);
     }
 
+    void updateMinutes(String id, String minutes) {
+        Meeting existingMeeting = findMeetingById(id);
+
+        Meeting updatedMeeting = existingMeeting.updateMinutes(minutes);
+        meetingRepository.save(updatedMeeting);
+    }
+
 }

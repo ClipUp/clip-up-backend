@@ -44,4 +44,8 @@ public class MeetingService {
         return meetingReader.readAllDeleted(userId, lastMeetingId, limit);
     }
 
+    public void updateMinutes(String meetingId, String minutes) {
+        meetingWriter.updateMinutes(meetingId, minutes);
+    }
+
 }
