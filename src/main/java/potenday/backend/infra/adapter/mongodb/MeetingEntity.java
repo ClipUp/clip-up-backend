@@ -36,6 +36,7 @@ class MeetingEntity {
             .audioFileUrl(meeting.audioFileUrl())
             .audioFileDuration(meeting.audioFileDuration())
             .script(meeting.script())
+            .minutes(meeting.minutes())
             .createTime(meeting.createTime())
             .updateTime(meeting.updateTime())
             .build();
@@ -49,6 +50,7 @@ class MeetingEntity {
             .audioFileUrl(audioFileUrl)
             .audioFileDuration(audioFileDuration)
             .script(script)
+            .minutes(minutes)
             .createTime(createTime)
             .updateTime(updateTime)
             .build();
