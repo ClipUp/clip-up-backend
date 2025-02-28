@@ -37,7 +37,7 @@ class LoginInfoWriter {
         LoginInfo existLoginInfo = loginInfoRepository.findByUserIdAndMethod(userId, LoginMethod.EMAIL)
             .orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
 
-        if (encoderProvider.matches(originalPassword, existLoginInfo.password())) {
+        if (!encoderProvider.matches(originalPassword, existLoginInfo.password())) {
             throw ErrorCode.UNAUTHORIZED.toException();
         }
 
