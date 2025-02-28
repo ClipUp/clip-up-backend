@@ -1,33 +1,25 @@
 package potenday.backend.domain;
 
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Getter;
-import org.springframework.data.mongodb.core.mapping.Document;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Builder(access = AccessLevel.PRIVATE)
-@Document
-public class Meeting {
+@Builder(toBuilder = true)
+public record Meeting(
+    String id,
+    String ownerId,
+    String title,
+    String audioFileUrl,
+    Integer audioFileDuration,
+    List<Dialogue> script,
+    String minutes,
+    Long createTime,
+    Long updateTime,
+    Boolean isDeleted
+) {
 
     private static int DEFAULT_TITLE_LENGTH = 40;
-
-    private String id;
-    private String ownerId;
-    private String title;
-    private String audioFileUrl;
-    private Integer audioFileDuration;
-    @Default
-    private List<Dialogue> script = new ArrayList<>();
-    private String minutes;
-    private Long createTime;
-    private Long updateTime;
-    private Boolean isDeleted;
 
     public static Meeting create(
         String id,
@@ -55,28 +47,19 @@ public class Meeting {
     public Meeting update(String userId, String title, Long currentTime) {
         checkOwner(userId);
 
-        this.title = title;
-        this.createTime = currentTime;
-
-        return this;
+        return this.toBuilder().title(title).updateTime(currentTime).build();
     }
 
     public Meeting delete(String userId, Long currentTime) {
         checkOwner(userId);
 
-        this.isDeleted = true;
-        this.updateTime = currentTime;
-
-        return this;
+        return this.toBuilder().isDeleted(true).updateTime(currentTime).build();
     }
 
     public Meeting restore(String userId, Long currentTime) {
         checkOwner(userId);
 
-        this.isDeleted = false;
-        this.updateTime = currentTime;
-
-        return this;
+        return this.toBuilder().isDeleted(false).updateTime(currentTime).build();
     }
 
     private void checkOwner(String userId) {

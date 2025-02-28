@@ -1,11 +1,13 @@
 package potenday.backend;
 
-import org.springframework.boot.SpringApplication;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
-public class TestBackendApplication {
+@SpringBootTest
+class BackendApplicationTests {
 
-    public static void main(String[] args) {
-        SpringApplication.from(BackendApplication::main).with(TestcontainersConfiguration.class).run(args);
+    @Test
+    void contextLoads() {
     }
 
 }

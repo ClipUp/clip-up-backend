@@ -1,22 +1,15 @@
 package potenday.backend.domain;
 
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Getter
-@Builder(access = AccessLevel.PRIVATE)
-@Document
-public class User {
-
-    @Id
-    private String id;
-    private String email;
-    private String username;
-    private Long createTime;
-    private Long updateTime;
+@Builder(toBuilder = true)
+public record User(
+    String id,
+    String email,
+    String username,
+    Long createTime,
+    Long updateTime
+) {
 
     public static User create(String id, String email, String username, Long currentTime) {
         return User.builder()
@@ -29,11 +22,7 @@ public class User {
     }
 
     public User update(String email, String username, Long currentTime) {
-        this.email = email;
-        this.username = username;
-        this.updateTime = currentTime;
-
-        return this;
+        return this.toBuilder().email(email).username(username).updateTime(currentTime).build();
     }
 
 }

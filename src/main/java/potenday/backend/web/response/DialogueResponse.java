@@ -10,7 +10,7 @@ record DialogueResponse(
 ) {
 
     static DialogueResponse from(Dialogue dialogue) {
-        return new DialogueResponse(dialogue.getSpeaker(), dialogue.getStartTime(), dialogue.getEndTime(), dialogue.getText());
+        return new DialogueResponse(dialogue.speaker(), dialogue.startTime(), dialogue.endTime(), dialogue.text());
     }
 
 }

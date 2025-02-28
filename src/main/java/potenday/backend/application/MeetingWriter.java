@@ -5,8 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import potenday.backend.domain.Meeting;
-import potenday.backend.domain.repository.MeetingRepository;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
 import java.util.List;
 

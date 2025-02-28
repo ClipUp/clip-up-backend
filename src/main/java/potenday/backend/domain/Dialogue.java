@@ -2,16 +2,14 @@ package potenday.backend.domain;
 
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 
-@Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class Dialogue {
-
-    String speaker;
-    Long startTime;
-    Long endTime;
-    String text;
+public record Dialogue(
+    String speaker,
+    Long startTime,
+    Long endTime,
+    String text
+) {
 
     public static Dialogue create(String speaker, Long startTime, Long endTime, String test) {
         return Dialogue.builder()

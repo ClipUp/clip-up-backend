@@ -1,4 +1,4 @@
-package potenday.backend.infra;
+package potenday.backend.infra.provider;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import potenday.backend.application.FileUploader;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
 import java.io.IOException;
 

@@ -16,13 +16,13 @@ public record MeetingResponse(
 
     public static MeetingResponse from(Meeting meeting) {
         return new MeetingResponse(
-            meeting.getId(),
-            meeting.getTitle(),
-            meeting.getScript().stream().map(DialogueResponse::from).toList(),
-            meeting.getAudioFileUrl(),
-            meeting.getMinutes(),
-            meeting.getCreateTime(),
-            meeting.getUpdateTime()
+            meeting.id(),
+            meeting.title(),
+            meeting.script().stream().map(DialogueResponse::from).toList(),
+            meeting.audioFileUrl(),
+            meeting.minutes(),
+            meeting.createTime(),
+            meeting.updateTime()
         );
     }
 

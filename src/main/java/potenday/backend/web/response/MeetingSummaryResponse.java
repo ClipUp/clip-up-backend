@@ -11,10 +11,10 @@ public record MeetingSummaryResponse(
 
     public static MeetingSummaryResponse from(Meeting meeting) {
         return new MeetingSummaryResponse(
-            meeting.getId(),
-            meeting.getTitle(),
-            meeting.getAudioFileDuration(),
-            meeting.getCreateTime()
+            meeting.id(),
+            meeting.title(),
+            meeting.audioFileDuration(),
+            meeting.createTime()
         );
     }
 

@@ -3,8 +3,7 @@ package potenday.backend.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import potenday.backend.domain.Meeting;
-import potenday.backend.domain.repository.MeetingRepository;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ class MeetingReader {
 
     Meeting read(String userId, String id) {
         Meeting existMeeting = meetingRepository.findById(id).orElseThrow(ErrorCode.MEETING_NOT_FOUNDED::toException);
-        if (!existMeeting.getOwnerId().equals(userId)) {
+        if (!existMeeting.ownerId().equals(userId)) {
             throw ErrorCode.FORBIDDEN.toException();
         }
         return existMeeting;

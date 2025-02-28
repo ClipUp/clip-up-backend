@@ -1,22 +1,15 @@
 package potenday.backend.domain;
 
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Getter
-@Builder(access = AccessLevel.PRIVATE)
-@Document
-public class LoginInfo {
-
-    @Id
-    private String id;
-    private String userId;
-    private LoginMethod method;
-    private String loginKey;
-    private String password;
+@Builder(toBuilder = true)
+public record LoginInfo(
+    String id,
+    String userId,
+    LoginMethod method,
+    String loginKey,
+    String password
+) {
 
     public static LoginInfo create(String id, String userId, LoginMethod method, String loginKey) {
         if (method.equals(LoginMethod.EMAIL)) {
@@ -42,9 +35,7 @@ public class LoginInfo {
     }
 
     public LoginInfo update(String password) {
-        this.password = password;
-
-        return this;
+        return this.toBuilder().password(password).build();
     }
 
 }

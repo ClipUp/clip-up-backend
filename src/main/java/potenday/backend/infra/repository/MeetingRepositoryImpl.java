@@ -1,4 +1,4 @@
-package potenday.backend.domain.repository;
+package potenday.backend.infra.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+import potenday.backend.application.MeetingRepository;
 import potenday.backend.domain.Meeting;
 
 import java.util.List;
@@ -16,26 +17,29 @@ import java.util.Optional;
 class MeetingRepositoryImpl implements MeetingRepository {
 
     private final MongoTemplate mongoTemplate;
-    private final MongoMeetingRepository mongoMeetingRepository;
+    private final MeetingEntityRepository mongoMeetingRepository;
 
     @Override
     public void saveAll(List<Meeting> meetings) {
-        mongoMeetingRepository.saveAll(meetings);
+        mongoMeetingRepository.saveAll(meetings.stream().map(MeetingEntity::from).toList());
     }
 
     @Override
     public void save(Meeting meeting) {
-        mongoMeetingRepository.save(meeting);
+        mongoMeetingRepository.save(MeetingEntity.from(meeting));
     }
 
     @Override
     public Optional<Meeting> findById(String id) {
-        return mongoMeetingRepository.findById(id);
+        return mongoMeetingRepository.findById(id).map(MeetingEntity::toMeeting);
     }
 
     @Override
     public List<Meeting> findAllByIdInAndOwnerIdAndIsDeleted(List<String> id, String ownerId, Boolean isDeleted) {
-        return mongoMeetingRepository.findAllByIdInAndOwnerIdAndIsDeleted(id, ownerId, isDeleted);
+        return mongoMeetingRepository.findAllByIdInAndOwnerIdAndIsDeleted(id, ownerId, isDeleted)
+            .stream()
+            .map(MeetingEntity::toMeeting)
+            .toList();
     }
 
     @Override
@@ -56,7 +60,7 @@ class MeetingRepositoryImpl implements MeetingRepository {
         query.limit(limit);
         query.with(Sort.by(Sort.Order.desc("_id")));
 
-        return mongoTemplate.find(query, Meeting.class);
+        return mongoTemplate.find(query, MeetingEntity.class).stream().map(MeetingEntity::toMeeting).toList();
     }
 
 }

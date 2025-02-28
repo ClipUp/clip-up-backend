@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
 import potenday.backend.domain.User;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
 import java.util.Optional;
 
@@ -22,7 +22,7 @@ public class AuthService {
     @Transactional
     public void register(String email, String password, String username) {
         User newUser = userWriter.create(email, username);
-        loginInfoWriter.create(newUser.getId(), email, password);
+        loginInfoWriter.create(newUser.id(), email, password);
     }
 
     public void updatePassword(String userId, String originalPassword, String newPassword) {
@@ -32,20 +32,20 @@ public class AuthService {
     public String[] login(String email, String password) {
         LoginInfo existLoginInfo = loginInfoReader.read(email, password);
 
-        return issueToken(existLoginInfo.getUserId());
+        return issueToken(existLoginInfo.userId());
     }
 
     @Transactional
     public String[] login(LoginMethod method, String loginKey, String email, String username) {
         Optional<LoginInfo> existLoginInfo = loginInfoReader.read(method, loginKey);
         if (existLoginInfo.isPresent()) {
-            return issueToken(existLoginInfo.get().getUserId());
+            return issueToken(existLoginInfo.get().userId());
         }
 
         User newUser = userWriter.create(email, username);
-        loginInfoWriter.create(newUser.getId(), method, loginKey);
+        loginInfoWriter.create(newUser.id(), method, loginKey);
 
-        return issueToken(newUser.getId());
+        return issueToken(newUser.id());
     }
 
     public String[] reissueToken(String refreshToken) {

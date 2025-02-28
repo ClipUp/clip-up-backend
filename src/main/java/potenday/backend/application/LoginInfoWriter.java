@@ -5,8 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
-import potenday.backend.domain.repository.LoginInfoRepository;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
 @RequiredArgsConstructor
 @Component
@@ -35,7 +34,7 @@ class LoginInfoWriter {
         LoginInfo existLoginInfo = loginInfoRepository.findByUserIdAndMethod(userId, LoginMethod.EMAIL)
             .orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
 
-        if (encoderProvider.matches(originalPassword, existLoginInfo.getPassword())) {
+        if (encoderProvider.matches(originalPassword, existLoginInfo.password())) {
             throw ErrorCode.UNAUTHORIZED.toException();
         }
 

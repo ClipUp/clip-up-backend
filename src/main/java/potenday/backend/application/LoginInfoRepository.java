@@ -1,14 +1,13 @@
-package potenday.backend.domain.repository;
+package potenday.backend.application;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
 
 import java.util.Optional;
 
-@Repository
-public interface LoginInfoRepository extends MongoRepository<LoginInfo, String> {
+public interface LoginInfoRepository {
+
+    void save(LoginInfo loginInfo);
 
     Optional<LoginInfo> findByUserIdAndMethod(String userId, LoginMethod method);
 

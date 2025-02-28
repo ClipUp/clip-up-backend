@@ -3,8 +3,7 @@ package potenday.backend.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import potenday.backend.domain.User;
-import potenday.backend.domain.repository.UserRepository;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
 @RequiredArgsConstructor
 @Component

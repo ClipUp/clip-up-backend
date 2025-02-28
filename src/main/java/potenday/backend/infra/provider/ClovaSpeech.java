@@ -1,4 +1,4 @@
-package potenday.backend.infra;
+package potenday.backend.infra.provider;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import potenday.backend.application.STTConverter;
 import potenday.backend.domain.Dialogue;
-import potenday.backend.support.ErrorCode;
+import potenday.backend.support.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
