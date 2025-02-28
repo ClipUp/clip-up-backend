@@ -9,7 +9,7 @@ import java.util.List;
 interface MeetingEntityRepository extends JpaRepository<MeetingEntity, String> {
 
     @Query(
-        value = "SELECT meeting.id, meeting.title, meeting.audio_file_duration, meeting.create_time " +
+        value = "SELECT meeting.id, meeting.owner_id, meeting.title, meeting.audio_file_url, meeting.audio_file_duration, meeting.script, meeting.minutes, meeting.create_time, meeting.update_time, meeting.is_deleted " +
             "FROM meeting " +
             "WHERE owner_id = :ownerId AND is_deleted = :isDeleted " +
             "ORDER BY id DESC LIMIT :limit",
@@ -22,7 +22,7 @@ interface MeetingEntityRepository extends JpaRepository<MeetingEntity, String> {
     );
 
     @Query(
-        value = "SELECT meeting.id, meeting.title, meeting.audio_file_duration, meeting.create_time " +
+        value = "SELECT meeting.id, meeting.owner_id, meeting.title, meeting.audio_file_url, meeting.audio_file_duration, meeting.script, meeting.minutes, meeting.create_time, meeting.update_time, meeting.is_deleted " +
             "FROM meeting " +
             "WHERE owner_id = :ownerId AND is_deleted = :isDeleted AND id < :lastId " +
             "ORDER BY id DESC LIMIT :limit",
