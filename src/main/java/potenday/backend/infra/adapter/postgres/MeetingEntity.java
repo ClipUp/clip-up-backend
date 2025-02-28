@@ -1,18 +1,21 @@
-package potenday.backend.infra.adapter.mongodb;
+package potenday.backend.infra.adapter.postgres;
 
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Builder.Default;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.NoArgsConstructor;
 import potenday.backend.domain.Dialogue;
 import potenday.backend.domain.Meeting;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Builder(access = AccessLevel.PRIVATE)
-@Document(collection = "meeting")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Entity(name = "meeting")
 class MeetingEntity {
 
     @Id
@@ -21,8 +24,8 @@ class MeetingEntity {
     private String title;
     private String audioFileUrl;
     private Integer audioFileDuration;
-    @Default
-    private List<Dialogue> script = new ArrayList<>();
+    @Convert(converter = ScriptConverter.class)
+    private List<Dialogue> script;
     private String minutes;
     private Long createTime;
     private Long updateTime;

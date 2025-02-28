@@ -1,4 +1,4 @@
-package potenday.backend.infra.adapter.mongodb;
+package potenday.backend.infra.adapter.postgres;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

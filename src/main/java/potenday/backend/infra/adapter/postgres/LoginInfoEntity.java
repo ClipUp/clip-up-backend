@@ -1,19 +1,26 @@
-package potenday.backend.infra.adapter.mongodb;
+package potenday.backend.infra.adapter.postgres;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.NoArgsConstructor;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
 
 @Builder(access = AccessLevel.PRIVATE)
-@Document(collection = "loginInfo")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Entity(name = "login_info")
 class LoginInfoEntity {
 
     @Id
     private String id;
     private String userId;
+    @Enumerated(EnumType.STRING)
     private LoginMethod method;
     private String loginKey;
     private String password;

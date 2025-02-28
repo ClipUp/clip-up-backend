@@ -1,4 +1,4 @@
-package potenday.backend.infra.adapter.mongodb;
+package potenday.backend.infra.adapter;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

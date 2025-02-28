@@ -1,13 +1,17 @@
-package potenday.backend.infra.adapter.mongodb;
+package potenday.backend.infra.adapter.postgres;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.NoArgsConstructor;
 import potenday.backend.domain.User;
 
 @Builder(access = AccessLevel.PRIVATE)
-@Document(collection = "user")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Entity(name = "service_user")
 class UserEntity {
 
     @Id

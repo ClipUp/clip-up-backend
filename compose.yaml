@@ -1,10 +1,4 @@
 services:
-  mongodb:
-    image: 'mongo:latest'
-    env_file:
-      - .env
-    ports:
-      - '27017:27017'
   pgvector:
     image: 'pgvector/pgvector:pg16'
     env_file:

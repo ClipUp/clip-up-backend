@@ -1,11 +1,11 @@
-package potenday.backend.infra.adapter.mongodb;
+package potenday.backend.infra.adapter.postgres;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import potenday.backend.domain.LoginMethod;
 
 import java.util.Optional;
 
-interface LoginInfoEntityRepository extends MongoRepository<LoginInfoEntity, String> {
+interface LoginInfoEntityRepository extends JpaRepository<LoginInfoEntity, String> {
 
     Optional<LoginInfoEntity> findByUserIdAndMethod(String userId, LoginMethod method);
 
