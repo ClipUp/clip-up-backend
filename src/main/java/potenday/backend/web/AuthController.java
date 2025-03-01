@@ -2,6 +2,7 @@ package potenday.backend.web;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -15,6 +16,7 @@ import potenday.backend.web.request.RegisterRequest;
 import potenday.backend.web.response.TokenResponse;
 
 @RequiredArgsConstructor
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
 class AuthController {
@@ -35,6 +37,7 @@ class AuthController {
         @AuthenticationPrincipal String userId,
         @RequestBody @Valid PasswordUpdateRequest request
     ) {
+        log.info("{} {}", request.originalPassword(), request.newPassword());
         authService.updatePassword(userId, request.originalPassword(), request.newPassword());
     }
 

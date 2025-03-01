@@ -1,5 +1,6 @@
 package potenday.backend.web;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -58,19 +59,19 @@ class MeetingController {
 
     @PutMapping("/{meetingId}")
     MeetingResponse updateMeeting(
-        @PathVariable String meetingId, @AuthenticationPrincipal String userId, @RequestBody
+        @PathVariable String meetingId, @AuthenticationPrincipal String userId, @RequestBody @Valid
         MeetingUpdateRequest request
     ) {
         return MeetingResponse.from(meetingService.updateMeeting(meetingId, userId, request.title()));
     }
 
     @DeleteMapping
-    void deleteMeeting(@AuthenticationPrincipal String userId, @RequestBody MeetingDeleteRequest request) {
+    void deleteMeeting(@AuthenticationPrincipal String userId, @RequestBody @Valid MeetingDeleteRequest request) {
         meetingService.deleteMeetings(userId, request.meetingIds());
     }
 
     @DeleteMapping("/trash")
-    void restoreMeeting(@AuthenticationPrincipal String userId, @RequestBody MeetingRestoreRequest request) {
+    void restoreMeeting(@AuthenticationPrincipal String userId, @RequestBody @Valid MeetingRestoreRequest request) {
         meetingService.restoreMeetings(userId, request.meetingIds());
     }
 
