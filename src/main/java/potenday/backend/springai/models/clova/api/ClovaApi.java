@@ -51,22 +51,43 @@ public class ClovaApi {
     public ChatCompletion chatCompletionEntity(ChatCompletionRequest chatRequest) {
         Assert.notNull(chatRequest, "The request body can not be null.");
 
-        ResponseEntity<ChatCompletionResponse> chatResponse = this.restClient.post()
-            .uri(this.completionsPath + chatRequest.model)
-            .body(chatRequest)
-            .retrieve()
-            .toEntity(ChatCompletionResponse.class);
+        int retryCount = 0;
+        final int maxRetries = 3;
 
-        if (!chatResponse.getStatusCode()
-            .is2xxSuccessful()) {
-            throw new ClovaApiClientErrorException("Network Error");
+        while (retryCount < maxRetries) {
+            ResponseEntity<ChatCompletionResponse> chatResponse = this.restClient.post()
+                .uri(this.completionsPath + chatRequest.model)
+                .body(chatRequest)
+                .retrieve()
+                .toEntity(ChatCompletionResponse.class);
+
+            if (chatResponse.getBody() != null && chatResponse.getBody().status().code().equals("42901")) {
+                retryCount++;
+                if (retryCount < maxRetries) {
+                    try {
+                        Thread.sleep(60000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new ClovaApiClientErrorException("Thread interrupted during retry wait", e);
+                    }
+                    continue;
+                } else {
+                    throw new ClovaApiClientErrorException("Received 42901 status code after " + maxRetries + " retries");
+                }
+            }
+
+            if (!chatResponse.getStatusCode().is2xxSuccessful()) {
+                throw new ClovaApiClientErrorException("Network Error");
+            }
+
+            if (!(chatResponse.getBody() != null && chatResponse.getBody().status().code().equals("20000"))) {
+                throw new ClovaApiClientErrorException(chatResponse.getBody().status().toString());
+            }
+
+            return chatResponse.getBody().result;
         }
 
-        if (!(chatResponse.getBody() != null && chatResponse.getBody().status().code().equals("20000"))) {
-            throw new ClovaApiClientErrorException(chatResponse.getBody().status().toString());
-        }
-
-        return chatResponse.getBody().result;
+        throw new ClovaApiClientErrorException("Max retry attempts exceeded");
     }
 
     public enum ChatCompletionFinishReason {

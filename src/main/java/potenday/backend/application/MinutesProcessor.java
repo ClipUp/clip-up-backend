@@ -24,7 +24,7 @@ class MinutesProcessor {
     private static final int DEFAULT_CHUNK_SIZE = 3000;
     private static final int MIN_CHUNK_SIZE_CHARS = 350;
     private static final int MIN_CHUNK_LENGTH_TO_EMBED = 5;
-    private static final int MAX_NUM_CHUNKS = 15;
+    private static final int MAX_NUM_CHUNKS = 100;
     private static final boolean KEEP_SEPARATOR = true;
     private static final int MAX_TOKENS = 4096;
 
@@ -39,6 +39,12 @@ class MinutesProcessor {
 
     String generate(List<Dialogue> script) {
         List<Document> documents = splitScript(script);
+        if (documents.isEmpty()) {
+            return "회의 내용이 존재하지 않습니다.";
+        } else if (documents.size() == 1 && documents.getFirst().getText().length() < 1000) {
+            return "회의 내용이 너무 적습니다.";
+        }
+
         return processInBatches(documents);
     }
 
