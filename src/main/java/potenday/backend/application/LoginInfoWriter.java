@@ -32,6 +32,16 @@ class LoginInfoWriter {
         loginInfoRepository.save(newLoginInfo);
     }
 
+    void update(String userId, String email) {
+        loginInfoRepository.findByUserIdAndMethod(userId, LoginMethod.EMAIL)
+            .ifPresent((existLoginInfo) -> {
+                if (!existLoginInfo.loginKey().equals(email)) {
+                    LoginInfo updatedLoginInfo = existLoginInfo.updateLoginKey(email);
+                    loginInfoRepository.save(updatedLoginInfo);
+                }
+            });
+    }
+
     @Transactional
     void update(String userId, String originalPassword, String newPassword) {
         LoginInfo existLoginInfo = loginInfoRepository.findByUserIdAndMethod(userId, LoginMethod.EMAIL)
@@ -41,7 +51,7 @@ class LoginInfoWriter {
             throw ErrorCode.UNAUTHORIZED.toException();
         }
 
-        LoginInfo updatedLoginInfo = existLoginInfo.update(encoderProvider.encode(newPassword));
+        LoginInfo updatedLoginInfo = existLoginInfo.updatePassword(encoderProvider.encode(newPassword));
         loginInfoRepository.save(updatedLoginInfo);
     }
 

@@ -34,8 +34,12 @@ public record LoginInfo(
             .build();
     }
 
-    public LoginInfo update(String password) {
+    public LoginInfo updatePassword(String password) {
         return this.toBuilder().password(password).build();
+    }
+
+    public LoginInfo updateLoginKey(String email) {
+        return this.toBuilder().loginKey(email).build();
     }
 
 }
