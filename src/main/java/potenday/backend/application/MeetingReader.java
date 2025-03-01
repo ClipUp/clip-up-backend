@@ -22,6 +22,10 @@ class MeetingReader {
         return existMeeting;
     }
 
+    Meeting read(String id) {
+        return meetingRepository.findById(id).orElseThrow(ErrorCode.MEETING_NOT_FOUNDED::toException);
+    }
+
     List<Meeting> readAll(String userId, String lastId, Integer limit) {
         return meetingRepository.findByOwnerIdAndIsDeletedAndIdGreaterThan(userId, false, lastId, limit);
     }

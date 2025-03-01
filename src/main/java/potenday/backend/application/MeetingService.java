@@ -36,6 +36,10 @@ public class MeetingService {
         return meetingReader.read(userId, meetingId);
     }
 
+    public Meeting readMeeting(String meetingId) {
+        return meetingReader.read(meetingId);
+    }
+
     public List<Meeting> readAllMeetings(String userId, String lastMeetingId, Integer limit) {
         return meetingReader.readAll(userId, lastMeetingId, limit);
     }
