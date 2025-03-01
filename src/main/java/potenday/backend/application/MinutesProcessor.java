@@ -41,7 +41,7 @@ class MinutesProcessor {
         List<Document> documents = splitScript(script);
         if (documents.isEmpty()) {
             return "회의 내용이 존재하지 않습니다.";
-        } else if (documents.size() == 1 && documents.getFirst().getText().length() < 500) {
+        } else if (documents.size() == 1 && documents.getFirst().getText().length() < 100) {
             return "회의 내용이 너무 적습니다.";
         }
 
