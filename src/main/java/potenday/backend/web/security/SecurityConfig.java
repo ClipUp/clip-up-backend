@@ -1,4 +1,4 @@
-package potenday.backend.infra.security;
+package potenday.backend.web.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

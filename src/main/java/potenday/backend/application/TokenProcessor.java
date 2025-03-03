@@ -12,14 +12,18 @@ import java.util.Optional;
 @Component
 class TokenProcessor {
 
+    private static final Duration ACCESS_TOKEN_EXPIRES_IN = Duration.ofHours(1);
+    private static final Duration REFRESH_TOKEN_EXPIRES_IN = Duration.ofHours(1);
+
     private final TokenProvider tokenProvider;
 
     String issueAccessToken(String userId) {
-        return issueToken(userId, TokenType.ACCESS);
+        Map<String, Object> payload = Map.of("userId", userId);
+        return tokenProvider.issueToken(payload, ACCESS_TOKEN_EXPIRES_IN);
     }
 
-    String issueRefreshToken(String userId) {
-        return issueToken(userId, TokenType.REFRESH);
+    String issueRefreshToken() {
+        return tokenProvider.issueToken(REFRESH_TOKEN_EXPIRES_IN);
     }
 
     Optional<String> getUserId(String token) {
@@ -29,26 +33,6 @@ class TokenProcessor {
             return (userId instanceof String) ? Optional.of((String) userId) : Optional.empty();
         } catch (Exception ignored) {
             return Optional.empty();
-        }
-    }
-
-    private String issueToken(String userId, TokenType tokenType) {
-        Map<String, Object> payload = Map.of("userId", userId);
-        return tokenProvider.issueToken(payload, tokenType.getExpiration());
-    }
-
-    private enum TokenType {
-        ACCESS(Duration.ofHours(1)),
-        REFRESH(Duration.ofDays(7));
-
-        private final Duration expiration;
-
-        TokenType(Duration expiration) {
-            this.expiration = expiration;
-        }
-
-        Duration getExpiration() {
-            return expiration;
         }
     }
 

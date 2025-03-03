@@ -8,8 +8,12 @@ services:
     ports:
       - '5432:5432'
   redis:
-    image: 'bitnami/redis:latest'
+    image: 'redis:alpine'
     env_file:
       - .env
     ports:
       - '6379:6379'
+    command:
+      - /bin/sh
+      - -c
+      - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"

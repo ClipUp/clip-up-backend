@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import potenday.backend.application.AuthService;
+import potenday.backend.application.dto.Tokens;
+import potenday.backend.support.exception.ErrorCode;
 import potenday.backend.web.request.LoginRequest;
 import potenday.backend.web.request.PasswordUpdateRequest;
 import potenday.backend.web.request.RegisterRequest;
@@ -40,24 +42,27 @@ class AuthController {
 
     @PostMapping("/login")
     ResponseEntity<TokenResponse> login(@RequestBody @Valid LoginRequest request) {
-        String[] tokens = authService.login(request.email(), request.password());
+        Tokens tokens = authService.login(request.email(), request.password());
         return ResponseEntity.status(HttpStatus.OK)
-            .header(HttpHeaders.SET_COOKIE, setRefreshTokenCookie(tokens[1]))
-            .body(TokenResponse.of(tokens[0]));
+            .header(HttpHeaders.SET_COOKIE, setRefreshTokenCookie(tokens.refreshToken()))
+            .body(TokenResponse.of(tokens.accessToken()));
     }
 
     @PostMapping("/logout")
-    ResponseEntity<Void> logout() {
-        return ResponseEntity.status(HttpStatus.OK)
-            .header(HttpHeaders.SET_COOKIE, removeRefreshTokenCookie()).build();
+    void logout(@AuthenticationPrincipal String userId) {
+        authService.logout(userId);
     }
 
     @PostMapping("/token")
     ResponseEntity<TokenResponse> login(@CookieValue(value = REFRESH_TOKEN_KEY, required = false) String refreshToken) {
-        String[] tokens = authService.reissueToken(refreshToken);
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw ErrorCode.UNAUTHORIZED.toException();
+        }
+
+        Tokens tokens = authService.reissueToken(refreshToken);
         return ResponseEntity.status(HttpStatus.OK)
-            .header(HttpHeaders.SET_COOKIE, setRefreshTokenCookie(tokens[1]))
-            .body(TokenResponse.of(tokens[0]));
+            .header(HttpHeaders.SET_COOKIE, setRefreshTokenCookie(tokens.refreshToken()))
+            .body(TokenResponse.of(tokens.accessToken()));
     }
 
     private String setRefreshTokenCookie(String refreshToken) {

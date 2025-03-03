@@ -1,4 +1,4 @@
-package potenday.backend.infra.security;
+package potenday.backend.web.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -22,7 +22,7 @@ public record User(
     }
 
     public User update(String email, String username, Long currentTime) {
-        return this.toBuilder().email(email).username(username).updateTime(currentTime).build();
+        return toBuilder().email(email).username(username).updateTime(currentTime).build();
     }
 
 }

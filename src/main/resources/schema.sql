@@ -32,3 +32,13 @@ CREATE TABLE clip_up.meeting
     update_time         BIGINT      NOT NULL,
     is_deleted          BOOLEAN
 );
+
+CREATE TABLE clip_up.service_session
+(
+    id          VARCHAR(20) PRIMARY KEY,
+    user_id     VARCHAR(20)         NOT NULL,
+    token       VARCHAR(255) UNIQUE NOT NULL,
+    is_blocked  BOOLEAN,
+    create_time BIGINT              NOT NULL,
+    update_time BIGINT              NOT NULL
+);

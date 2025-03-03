@@ -3,8 +3,10 @@ package potenday.backend.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import potenday.backend.application.dto.Tokens;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
+import potenday.backend.domain.Session;
 import potenday.backend.domain.User;
 import potenday.backend.support.exception.ErrorCode;
 
@@ -17,6 +19,8 @@ public class AuthService {
     private final LoginInfoReader loginInfoReader;
     private final LoginInfoWriter loginInfoWriter;
     private final UserWriter userWriter;
+    private final SessionReader sessionReader;
+    private final SessionWriter sessionWriter;
     private final TokenProcessor tokenProcessor;
 
     @Transactional
@@ -29,14 +33,22 @@ public class AuthService {
         loginInfoWriter.update(userId, originalPassword, newPassword);
     }
 
-    public String[] login(String email, String password) {
+    public Tokens login(String email, String password) {
         LoginInfo existLoginInfo = loginInfoReader.read(email, password);
 
-        return issueToken(existLoginInfo.userId());
+        Tokens tokens = issueToken(existLoginInfo.userId());
+
+        sessionWriter.create(existLoginInfo.userId(), tokens.refreshToken());
+
+        return tokens;
+    }
+
+    public void logout(String userId) {
+        sessionWriter.delete(userId);
     }
 
     @Transactional
-    public String[] login(LoginMethod method, String loginKey, String email, String username) {
+    public Tokens login(LoginMethod method, String loginKey, String email, String username) {
         Optional<LoginInfo> existLoginInfo = loginInfoReader.read(method, loginKey);
         if (existLoginInfo.isPresent()) {
             return issueToken(existLoginInfo.get().userId());
@@ -45,30 +57,36 @@ public class AuthService {
         User newUser = userWriter.create(email, username);
         loginInfoWriter.create(newUser.id(), method, loginKey);
 
-        return issueToken(newUser.id());
+        Tokens tokens = issueToken(newUser.id());
+
+        sessionWriter.create(newUser.id(), tokens.refreshToken());
+
+        return tokens;
     }
 
-    public String[] reissueToken(String refreshToken) {
-        if (refreshToken == null || refreshToken.isEmpty()) {
+    @Transactional
+    public Tokens reissueToken(String refreshToken) {
+        Session existSession = sessionReader.read(refreshToken);
+        if (existSession.isBlocked()) {
             throw ErrorCode.UNAUTHORIZED.toException();
         }
 
-        String userId = tokenProcessor.getUserId(refreshToken).orElseThrow(ErrorCode.UNAUTHORIZED::toException);
+        Tokens tokens = issueToken(existSession.userId());
 
-        String accessToken = tokenProcessor.issueRefreshToken(userId);
+        sessionWriter.update(existSession, tokens.refreshToken());
 
-        return new String[]{accessToken, refreshToken};
+        return tokens;
     }
 
     public Optional<String> getUserId(String accessToken) {
         return tokenProcessor.getUserId(accessToken);
     }
 
-    private String[] issueToken(String userId) {
+    private Tokens issueToken(String userId) {
         String accessToken = tokenProcessor.issueAccessToken(userId);
-        String refreshToken = tokenProcessor.issueRefreshToken(userId);
+        String refreshToken = tokenProcessor.issueRefreshToken();
 
-        return new String[]{accessToken, refreshToken};
+        return Tokens.of(accessToken, refreshToken);
     }
 
 }

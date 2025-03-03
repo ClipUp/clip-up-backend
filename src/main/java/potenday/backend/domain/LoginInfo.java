@@ -35,11 +35,11 @@ public record LoginInfo(
     }
 
     public LoginInfo updatePassword(String password) {
-        return this.toBuilder().password(password).build();
+        return toBuilder().password(password).build();
     }
 
     public LoginInfo updateLoginKey(String email) {
-        return this.toBuilder().loginKey(email).build();
+        return toBuilder().loginKey(email).build();
     }
 
 }

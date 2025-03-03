@@ -32,6 +32,8 @@ class MinutesProcessor {
     private static final int BATCH_SIZE = 5;
     private static final long WAIT_TIME_MINUTES = 1;
 
+    private static final int MIN_SCRIPT_LENGTH = 100;
+
     private final ChatClient chatClient;
     private final TextSplitter textSplitter = new TokenTextSplitter(
         DEFAULT_CHUNK_SIZE, MIN_CHUNK_SIZE_CHARS, MIN_CHUNK_LENGTH_TO_EMBED, MAX_NUM_CHUNKS, KEEP_SEPARATOR
@@ -41,7 +43,7 @@ class MinutesProcessor {
         List<Document> documents = splitScript(script);
         if (documents.isEmpty()) {
             return "회의 내용이 존재하지 않습니다.";
-        } else if (documents.size() == 1 && documents.getFirst().getText().length() < 100) {
+        } else if (documents.size() == 1 && documents.getFirst().getText().length() < MIN_SCRIPT_LENGTH) {
             return "회의 내용이 너무 적습니다.";
         }
 

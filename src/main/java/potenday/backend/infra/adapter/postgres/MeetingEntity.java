@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import potenday.backend.domain.Dialogue;
 import potenday.backend.domain.Meeting;
 
@@ -18,6 +20,8 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 @Table(schema = "clip_up", name = "meeting")
+@DynamicInsert
+@DynamicUpdate
 class MeetingEntity {
 
     @Id

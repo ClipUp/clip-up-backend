@@ -47,19 +47,19 @@ public record Meeting(
     public Meeting update(String userId, String title, Long currentTime) {
         checkOwner(userId);
 
-        return this.toBuilder().title(title).updateTime(currentTime).build();
+        return toBuilder().title(title).updateTime(currentTime).build();
     }
 
     public Meeting delete(String userId, Long currentTime) {
         checkOwner(userId);
 
-        return this.toBuilder().isDeleted(true).updateTime(currentTime).build();
+        return toBuilder().isDeleted(true).updateTime(currentTime).build();
     }
 
     public Meeting restore(String userId, Long currentTime) {
         checkOwner(userId);
 
-        return this.toBuilder().isDeleted(false).updateTime(currentTime).build();
+        return toBuilder().isDeleted(false).updateTime(currentTime).build();
     }
 
     private void checkOwner(String userId) {

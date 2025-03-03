@@ -25,6 +25,18 @@ class JWT implements TokenProvider {
     }
 
     @Override
+    public String issueToken(Duration duration) {
+        Instant now = Instant.now();
+        Instant expiredAt = now.plus(duration);
+
+        return Jwts.builder()
+            .issuedAt(Date.from(now))
+            .expiration(Date.from(expiredAt))
+            .signWith(secretKey)
+            .compact();
+    }
+
+    @Override
     public String issueToken(Map<String, Object> claims, Duration duration) {
         Instant now = Instant.now();
         Instant expiredAt = now.plus(duration);

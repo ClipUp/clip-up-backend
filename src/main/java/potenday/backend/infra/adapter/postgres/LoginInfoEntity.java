@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import potenday.backend.domain.LoginInfo;
 import potenday.backend.domain.LoginMethod;
 
@@ -13,6 +15,8 @@ import potenday.backend.domain.LoginMethod;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
 @Table(schema = "clip_up", name = "login_info")
+@DynamicInsert
+@DynamicUpdate
 class LoginInfoEntity {
 
     @Id
