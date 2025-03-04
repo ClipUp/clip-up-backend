@@ -38,8 +38,4 @@ public record LoginInfo(
         return toBuilder().password(password).build();
     }
 
-    public LoginInfo updateLoginKey(String email) {
-        return toBuilder().loginKey(email).build();
-    }
-
 }

@@ -27,19 +27,6 @@ class UserWriter {
         return newUser;
     }
 
-    User update(String id, String email, String username) {
-        User existUser = userRepository.findById(id).orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
-
-        if (!existUser.email().equals(email)) {
-            validateAlreadyUsedEmail(email);
-        }
-
-        User updatedUser = existUser.update(email, username, clockProvider.millis());
-        userRepository.save(updatedUser);
-
-        return updatedUser;
-    }
-
     private void validateAlreadyUsedEmail(String email) {
         if (userRepository.existsByEmail(email)) {
             throw ErrorCode.ALREADY_USED_EMAIL.toException();

@@ -21,8 +21,4 @@ public record User(
             .build();
     }
 
-    public User update(String email, String username, Long currentTime) {
-        return toBuilder().email(email).username(username).updateTime(currentTime).build();
-    }
-
 }
