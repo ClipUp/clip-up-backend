@@ -6,6 +6,7 @@ import lombok.Builder;
 import org.springframework.ai.model.ApiKey;
 import org.springframework.ai.model.NoopApiKey;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
@@ -42,7 +43,8 @@ public class ClovaApi {
 
             h.setContentType(MediaType.APPLICATION_JSON);
         };
-        this.restClient = restClientBuilder.baseUrl(baseUrl)
+        this.restClient = restClientBuilder
+            .baseUrl(baseUrl)
             .defaultHeaders(finalHeaders)
             .defaultStatusHandler(responseErrorHandler)
             .build();
@@ -51,43 +53,23 @@ public class ClovaApi {
     public ChatCompletion chatCompletionEntity(ChatCompletionRequest chatRequest) {
         Assert.notNull(chatRequest, "The request body can not be null.");
 
-        int retryCount = 0;
-        final int maxRetries = 3;
-
-        while (retryCount < maxRetries) {
-            ResponseEntity<ChatCompletionResponse> chatResponse = this.restClient.post()
-                .uri(this.completionsPath + chatRequest.model)
-                .body(chatRequest)
-                .retrieve()
-                .toEntity(ChatCompletionResponse.class);
-
-            if (chatResponse.getBody() != null && chatResponse.getBody().status().code().equals("42901")) {
-                retryCount++;
-                if (retryCount < maxRetries) {
-                    try {
-                        Thread.sleep(60000);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        throw new ClovaApiClientErrorException("Thread interrupted during retry wait", e);
-                    }
-                    continue;
-                } else {
-                    throw new ClovaApiClientErrorException("Received 42901 status code after " + maxRetries + " retries");
+        ResponseEntity<ChatCompletionResponse> chatResponse = this.restClient.post()
+            .uri(this.completionsPath + chatRequest.model)
+            .body(chatRequest)
+            .retrieve()
+            .onStatus(HttpStatus.TOO_MANY_REQUESTS::equals,
+                (request, response) -> {
+                    throw new ClovaApiClientErrorException("429 Too Many Requests");
                 }
-            }
+            )
 
-            if (!chatResponse.getStatusCode().is2xxSuccessful()) {
-                throw new ClovaApiClientErrorException("Network Error");
-            }
+            .toEntity(ChatCompletionResponse.class);
 
-            if (!(chatResponse.getBody() != null && chatResponse.getBody().status().code().equals("20000"))) {
-                throw new ClovaApiClientErrorException(chatResponse.getBody().status().toString());
-            }
-
-            return chatResponse.getBody().result;
+        if (!chatResponse.getStatusCode().is2xxSuccessful() || chatResponse.getBody() == null) {
+            throw new RuntimeException("Network Error");
         }
 
-        throw new ClovaApiClientErrorException("Max retry attempts exceeded");
+        return chatResponse.getBody().result;
     }
 
     public enum ChatCompletionFinishReason {

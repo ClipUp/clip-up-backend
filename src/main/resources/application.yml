@@ -33,15 +33,23 @@ spring:
   cloud:
     ncp:
       storage:
-        region: kr-standard
-        endpoint: https://kr.object.ncloudstorage.com
         access-key: ${NCP_ACCESS_KEY}
         secret-key: ${NCP_SECRET_KEY}
+        region: kr-standard
+        endpoint: https://kr.object.ncloudstorage.com
 
-  servlet:
-    multipart:
-      max-file-size: 1GB
-      max-request-size: 1GB
+  mail:
+    host: ${SMTP_HOST}
+    port: 587
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
 
   threads:
     virtual:
@@ -50,10 +58,15 @@ spring:
   profiles:
     active: local
 
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+
 server:
   tomcat:
     max-swallow-size: -1
-    max-http-form-post-size: 1GB
+    max-http-form-post-size: -1
     connection-timeout: 300000
 
 ---

@@ -10,12 +10,12 @@ import potenday.backend.web.response.MeetingResponse;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/test")
-class TestController {
+@RequestMapping("/admin")
+class AdminController {
 
     private final MeetingService meetingService;
 
-    @GetMapping("/{meetingId}")
+    @GetMapping("/meetings/{meetingId}")
     MeetingResponse readMeeting(@PathVariable String meetingId) {
         return MeetingResponse.from(meetingService.readMeeting(meetingId));
     }

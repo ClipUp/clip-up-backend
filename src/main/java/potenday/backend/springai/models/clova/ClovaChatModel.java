@@ -16,13 +16,18 @@ import org.springframework.ai.chat.observation.DefaultChatModelObservationConven
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.ModelOptionsUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
+import org.springframework.web.client.HttpStatusCodeException;
 import potenday.backend.springai.models.clova.api.ClovaApi;
 import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletion;
 import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletionMessage;
 import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletionRequest;
 import potenday.backend.springai.models.clova.api.common.ClovaAiApiConstants;
+import potenday.backend.springai.models.clova.api.common.ClovaApiClientErrorException;
 
 import java.util.List;
 import java.util.Map;
@@ -47,7 +52,7 @@ public class ClovaChatModel implements ChatModel {
         ObservationRegistry observationRegistry
     ) {
         this.defaultOptions = defaultOptions;
-        this.retryTemplate = retryTemplate;
+        this.retryTemplate = setRetryTemplate(retryTemplate);
         this.clovaApi = clovaApi;
         this.observationRegistry = observationRegistry;
     }
@@ -76,9 +81,18 @@ public class ClovaChatModel implements ChatModel {
             .observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> observationContext,
                 this.observationRegistry)
             .observe(() -> {
-
                 ChatCompletion chatCompletion = this.retryTemplate
-                    .execute(ctx -> this.clovaApi.chatCompletionEntity(request));
+                    .execute(ctx -> {
+                        try {
+                            return clovaApi.chatCompletionEntity(request);
+                        } catch (HttpStatusCodeException e) {
+                            if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+                                System.out.println("429 Too Many Requests - Retrying...");
+                                throw e;
+                            }
+                            throw e;
+                        }
+                    });
 
                 if (chatCompletion == null) {
                     log.warn("No chat completion returned for prompt: {}", prompt);
@@ -137,6 +151,20 @@ public class ClovaChatModel implements ChatModel {
         ClovaChatOptions requestOptions = ModelOptionsUtils.merge(runtimeOptions, this.defaultOptions, ClovaChatOptions.class);
 
         return new Prompt(prompt.getInstructions(), requestOptions);
+    }
+
+    private RetryTemplate setRetryTemplate(RetryTemplate retryTemplate) {
+        SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(3, Map.of(
+            ClovaApiClientErrorException.class, true
+        ));
+
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+        backOffPolicy.setBackOffPeriod(60000);
+
+        retryTemplate.setRetryPolicy(retryPolicy);
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+
+        return retryTemplate;
     }
 
 }

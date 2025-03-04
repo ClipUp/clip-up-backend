@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import potenday.backend.application.AuthService;
 import potenday.backend.application.dto.Tokens;
 import potenday.backend.support.exception.ErrorCode;
-import potenday.backend.web.request.LoginRequest;
-import potenday.backend.web.request.PasswordUpdateRequest;
-import potenday.backend.web.request.RegisterRequest;
+import potenday.backend.web.request.*;
 import potenday.backend.web.response.TokenResponse;
 
 @RequiredArgsConstructor
@@ -25,6 +23,16 @@ class AuthController {
     private static final long REFRESH_TOKEN_EXPIRES_IN = 7 * 24 * 60 * 60;
 
     private final AuthService authService;
+
+    @PostMapping("/email")
+    void sendEmail(@RequestBody @Valid EmailSendRequest request) {
+        authService.sendEmail(request.email());
+    }
+
+    @PostMapping("/email/code")
+    void validateEmail(@RequestBody @Valid EmailValidateRequest request) {
+        authService.validateEmail(request.email(), request.code());
+    }
 
     @PostMapping("/register")
     ResponseEntity<Void> register(@RequestBody @Valid RegisterRequest request) {

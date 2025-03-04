@@ -18,6 +18,12 @@ class UserReader {
         }
     }
 
+    void validateAlreadyUsedEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw ErrorCode.ALREADY_USED_EMAIL.toException();
+        }
+    }
+
     User read(String id) {
         return userRepository.findById(id).orElseThrow(ErrorCode.USER_NOT_FOUNDED::toException);
     }

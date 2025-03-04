@@ -14,13 +14,10 @@ class NCPConfig {
 
     @Value("${spring.cloud.ncp.storage.region}")
     private String region;
-
     @Value("${spring.cloud.ncp.storage.endpoint}")
     private String endPoint;
-
     @Value("${spring.cloud.ncp.storage.access-key}")
     private String accessKey;
-
     @Value("${spring.cloud.ncp.storage.secret-key}")
     private String secretKey;
 

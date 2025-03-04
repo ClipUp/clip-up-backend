@@ -22,9 +22,21 @@ public class AuthService {
     private final SessionReader sessionReader;
     private final SessionWriter sessionWriter;
     private final TokenProcessor tokenProcessor;
+    private final UserReader userReader;
+    private final EmailCodeProcessor emailCodeProcessor;
+
+    public void sendEmail(String email) {
+        userReader.validateAlreadyUsedEmail(email);
+        emailCodeProcessor.sendCode(email);
+    }
+
+    public void validateEmail(String email, String code) {
+        emailCodeProcessor.validateCode(email, code);
+    }
 
     @Transactional
     public void register(String email, String password, String username) {
+        emailCodeProcessor.deleteCode(email);
         User newUser = userWriter.create(email, username);
         loginInfoWriter.create(newUser.id(), email, password);
     }

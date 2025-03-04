@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -29,8 +28,6 @@ class MinutesProcessor {
     private static final int MAX_TOKENS = 4096;
 
     private static final int THREAD_POOL_SIZE = 5;
-    private static final int BATCH_SIZE = 5;
-    private static final long WAIT_TIME_MINUTES = 1;
 
     private static final int MIN_SCRIPT_LENGTH = 100;
 
@@ -62,36 +59,18 @@ class MinutesProcessor {
         StringBuilder sb = new StringBuilder();
 
         try (ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE)) {
-            for (int i = 0; i < documents.size(); i += BATCH_SIZE) {
-                List<Document> batch = documents.subList(i, Math.min(i + BATCH_SIZE, documents.size()));
+            List<CompletableFuture<String>> futures = documents.stream()
+                .map(doc -> CompletableFuture.supplyAsync(
+                    () -> chatClient.prompt().options(chatOptions).user(doc.getText()).call().content(), executor)
+                )
+                .toList();
 
-                List<CompletableFuture<String>> futures = batch.stream()
-                    .map(doc -> CompletableFuture.supplyAsync(
-                        () -> chatClient.prompt().options(chatOptions).user(doc.getText()).call().content(), executor)
-                    )
-                    .toList();
-
-                futures.stream()
-                    .map(CompletableFuture::join)
-                    .forEach(result -> sb.append(result).append("\n"));
-
-                // 마지막 batch가 아닐 경우 1분 대기
-                if (i + BATCH_SIZE < documents.size()) {
-                    waitForNextBatch();
-                }
-            }
+            futures.stream()
+                .map(CompletableFuture::join)
+                .forEach(result -> sb.append(result).append("\n"));
         }
 
         return sb.toString();
-    }
-
-    private void waitForNextBatch() {
-        try {
-            TimeUnit.MINUTES.sleep(WAIT_TIME_MINUTES);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Thread was interrupted", e);
-        }
     }
 
 }

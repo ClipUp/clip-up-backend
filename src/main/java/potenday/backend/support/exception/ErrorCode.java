@@ -14,6 +14,7 @@ public enum ErrorCode {
 
     // Auth
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "인증에 실패하였습니다."),
+    VALIDATE_EMAIL_FIRST(HttpStatus.UNAUTHORIZED, "이메일 인증을 먼저 수행해주세요."),
 
     // User
     ALREADY_USED_EMAIL(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
