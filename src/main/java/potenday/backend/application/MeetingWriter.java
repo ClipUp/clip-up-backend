@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import potenday.backend.application.port.ClockProvider;
-import potenday.backend.application.port.IdProvider;
-import potenday.backend.application.port.MeetingRepository;
 import potenday.backend.domain.Meeting;
+import potenday.backend.domain.repository.MeetingRepository;
 import potenday.backend.support.exception.ErrorCode;
 
 import java.util.List;
@@ -22,13 +20,13 @@ class MeetingWriter {
     private final STTProcessor sttProcessor;
     private final MinutesProcessor minutesProcessor;
 
-    Meeting create(String userId, MultipartFile audioFile) {
+    Meeting create(String userId, MultipartFile audioFile, Integer audioFileDuration) {
         String id = idProvider.nextId();
 
         STTProcessor.Result sttResult = sttProcessor.convert(id, audioFile);
         String minutes = minutesProcessor.generate(sttResult.script());
 
-        Meeting newMeeting = Meeting.create(id, userId, sttResult.audioFileUrl(), sttResult.audioFileDuration(), sttResult.script(), minutes, clockProvider.millis());
+        Meeting newMeeting = Meeting.create(id, userId, sttResult.audioFileUrl(), audioFileDuration, sttResult.script(), minutes, clockProvider.millis());
         meetingRepository.save(newMeeting);
 
         return newMeeting;

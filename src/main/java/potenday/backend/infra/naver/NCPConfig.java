@@ -1,4 +1,4 @@
-package potenday.backend.infra.config;
+package potenday.backend.infra.naver;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

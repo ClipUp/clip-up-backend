@@ -38,19 +38,6 @@ spring:
         region: kr-standard
         endpoint: https://kr.object.ncloudstorage.com
 
-  mail:
-    host: ${SMTP_HOST}
-    port: 587
-    username: ${SMTP_USERNAME}
-    password: ${SMTP_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          timeout: 5000
-          starttls:
-            enable: true
-
   threads:
     virtual:
       enabled: true
@@ -60,6 +47,7 @@ spring:
 
   servlet:
     multipart:
+      enabled: true
       max-file-size: -1
       max-request-size: -1
 

@@ -1,11 +1,11 @@
 package potenday.backend.web;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import potenday.backend.application.UserService;
-import potenday.backend.web.request.UserUpdateRequest;
 import potenday.backend.web.response.UserResponse;
 
 @RequiredArgsConstructor
@@ -18,11 +18,6 @@ class UserController {
     @GetMapping
     UserResponse readUser(@AuthenticationPrincipal String userId) {
         return UserResponse.from(userService.readUser(userId));
-    }
-
-    @PutMapping
-    UserResponse updateUser(@AuthenticationPrincipal String userId, @RequestBody @Valid UserUpdateRequest request) {
-        return UserResponse.from(userService.updateUser(userId, request.email(), request.username()));
     }
 
 }

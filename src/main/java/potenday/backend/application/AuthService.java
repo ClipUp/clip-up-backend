@@ -22,23 +22,11 @@ public class AuthService {
     private final SessionReader sessionReader;
     private final SessionWriter sessionWriter;
     private final TokenProcessor tokenProcessor;
-    private final UserReader userReader;
-    private final EmailCodeProcessor emailCodeProcessor;
-
-    public void sendEmail(String email) {
-        userReader.validateAlreadyUsedEmail(email);
-        emailCodeProcessor.sendCode(email);
-    }
-
-    public void validateEmail(String email, String code) {
-        emailCodeProcessor.validateCode(email, code);
-    }
 
     @Transactional
     public void register(String email, String password, String username) {
-        emailCodeProcessor.deleteCode(email);
         User newUser = userWriter.create(email, username);
-        loginInfoWriter.create(newUser.id(), email, password);
+        loginInfoWriter.create(newUser.getId(), email, password);
     }
 
     public void updatePassword(String userId, String originalPassword, String newPassword) {
@@ -48,9 +36,9 @@ public class AuthService {
     public Tokens login(String email, String password) {
         LoginInfo existLoginInfo = loginInfoReader.read(email, password);
 
-        Tokens tokens = issueToken(existLoginInfo.userId());
+        Tokens tokens = issueToken(existLoginInfo.getUserId());
 
-        sessionWriter.create(existLoginInfo.userId(), tokens.refreshToken());
+        sessionWriter.create(existLoginInfo.getUserId(), tokens.refreshToken());
 
         return tokens;
     }
@@ -63,15 +51,13 @@ public class AuthService {
     public Tokens login(LoginMethod method, String loginKey, String email, String username) {
         Optional<LoginInfo> existLoginInfo = loginInfoReader.read(method, loginKey);
         if (existLoginInfo.isPresent()) {
-            return issueToken(existLoginInfo.get().userId());
+            return issueToken(existLoginInfo.get().getUserId());
         }
 
-        User newUser = userWriter.create(email, username);
-        loginInfoWriter.create(newUser.id(), method, loginKey);
+        User newUser = register(method, loginKey, email, username);
 
-        Tokens tokens = issueToken(newUser.id());
-
-        sessionWriter.create(newUser.id(), tokens.refreshToken());
+        Tokens tokens = issueToken(newUser.getId());
+        sessionWriter.create(newUser.getId(), tokens.refreshToken());
 
         return tokens;
     }
@@ -79,11 +65,11 @@ public class AuthService {
     @Transactional
     public Tokens reissueToken(String refreshToken) {
         Session existSession = sessionReader.read(refreshToken);
-        if (existSession.isBlocked()) {
+        if (existSession.getIsBlocked()) {
             throw ErrorCode.UNAUTHORIZED.toException();
         }
 
-        Tokens tokens = issueToken(existSession.userId());
+        Tokens tokens = issueToken(existSession.getUserId());
 
         sessionWriter.update(existSession, tokens.refreshToken());
 
@@ -92,6 +78,12 @@ public class AuthService {
 
     public Optional<String> getUserId(String accessToken) {
         return tokenProcessor.getUserId(accessToken);
+    }
+
+    private User register(LoginMethod method, String loginKey, String email, String username) {
+        User newUser = userWriter.create(email, username);
+        loginInfoWriter.create(newUser.getId(), method, loginKey);
+        return newUser;
     }
 
     private Tokens issueToken(String userId) {

@@ -3,10 +3,8 @@ package potenday.backend.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import potenday.backend.application.port.ClockProvider;
-import potenday.backend.application.port.IdProvider;
-import potenday.backend.application.port.SessionRepository;
 import potenday.backend.domain.Session;
+import potenday.backend.domain.repository.SessionRepository;
 
 @RequiredArgsConstructor
 @Component
@@ -28,7 +26,7 @@ class SessionWriter {
 
     @Transactional
     void delete(String userId) {
-        sessionRepository.delete(userId);
+        sessionRepository.deleteByUserId(userId);
     }
 
 }

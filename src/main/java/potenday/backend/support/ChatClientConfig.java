@@ -1,4 +1,4 @@
-package potenday.backend.infra.config;
+package potenday.backend.support;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Value;

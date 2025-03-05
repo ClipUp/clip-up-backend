@@ -1,8 +1,8 @@
-package potenday.backend.infra.adapter;
+package potenday.backend.infra;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import potenday.backend.application.port.EncoderProvider;
+import potenday.backend.application.EncoderProvider;
 
 @Component
 public class BCrypt implements EncoderProvider {
@@ -16,7 +16,7 @@ public class BCrypt implements EncoderProvider {
 
     @Override
     public boolean matches(String text, String encodedText) {
-        return bCryptPasswordEncoder.matches(text, encodedText);
+        return !bCryptPasswordEncoder.matches(text, encodedText);
     }
 
 }

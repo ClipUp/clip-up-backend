@@ -3,10 +3,8 @@ package potenday.backend.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import potenday.backend.application.port.ClockProvider;
-import potenday.backend.application.port.IdProvider;
-import potenday.backend.application.port.UserRepository;
 import potenday.backend.domain.User;
+import potenday.backend.domain.repository.UserRepository;
 import potenday.backend.support.exception.ErrorCode;
 
 @RequiredArgsConstructor

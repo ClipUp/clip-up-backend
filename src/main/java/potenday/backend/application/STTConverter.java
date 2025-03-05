@@ -1,4 +1,4 @@
-package potenday.backend.application.port;
+package potenday.backend.application;
 
 
 import potenday.backend.domain.Dialogue;

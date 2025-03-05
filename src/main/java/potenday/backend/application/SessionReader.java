@@ -2,8 +2,8 @@ package potenday.backend.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import potenday.backend.application.port.SessionRepository;
 import potenday.backend.domain.Session;
+import potenday.backend.domain.repository.SessionRepository;
 import potenday.backend.support.exception.ErrorCode;
 
 @RequiredArgsConstructor

@@ -1,16 +1,29 @@
 package potenday.backend.domain;
 
-import lombok.Builder;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
-@Builder(toBuilder = true)
-public record Session(
-    String id,
-    String userId,
-    String token,
-    Boolean isBlocked,
-    Long createTime,
-    Long updateTime
-) {
+@Getter
+@Builder(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Entity
+@Table(schema = "clip_up", name = "service_session")
+@DynamicInsert
+@DynamicUpdate
+public class Session {
+
+    @Id
+    private String id;
+    private String userId;
+    private String token;
+    private Boolean isBlocked;
+    private Long createTime;
+    private Long updateTime;
 
     public static Session create(String id, String userId, String token, Long currentTime) {
         return Session.builder()
@@ -24,7 +37,10 @@ public record Session(
     }
 
     public Session update(String token, Long currentTime) {
-        return toBuilder().token(token).updateTime(currentTime).build();
+        this.token = token;
+        this.updateTime = currentTime;
+
+        return this;
     }
 
 }

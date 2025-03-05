@@ -1,25 +1,39 @@
 package potenday.backend.domain;
 
-import lombok.Builder;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import potenday.backend.support.exception.ErrorCode;
 
 import java.util.List;
 
-@Builder(toBuilder = true)
-public record Meeting(
-    String id,
-    String ownerId,
-    String title,
-    String audioFileUrl,
-    Integer audioFileDuration,
-    List<Dialogue> script,
-    String minutes,
-    Long createTime,
-    Long updateTime,
-    Boolean isDeleted
-) {
+@Getter
+@Builder(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Entity
+@Table(schema = "clip_up", name = "meeting")
+@DynamicInsert
+@DynamicUpdate
+public class Meeting {
 
     private static int DEFAULT_TITLE_LENGTH = 40;
+    @Id
+    private String id;
+    private String ownerId;
+    private String title;
+    private String audioFileUrl;
+    private Integer audioFileDuration;
+    @Convert(converter = ScriptConverter.class)
+    private List<Dialogue> script;
+    private String minutes;
+    private Long createTime;
+    private Long updateTime;
+    private Boolean isDeleted;
 
     public static Meeting create(
         String id,
@@ -47,19 +61,28 @@ public record Meeting(
     public Meeting update(String userId, String title, Long currentTime) {
         checkOwner(userId);
 
-        return toBuilder().title(title).updateTime(currentTime).build();
+        this.title = title;
+        this.updateTime = currentTime;
+        
+        return this;
     }
 
     public Meeting delete(String userId, Long currentTime) {
         checkOwner(userId);
 
-        return toBuilder().isDeleted(true).updateTime(currentTime).build();
+        this.isDeleted = true;
+        this.updateTime = currentTime;
+
+        return this;
     }
 
     public Meeting restore(String userId, Long currentTime) {
         checkOwner(userId);
 
-        return toBuilder().isDeleted(false).updateTime(currentTime).build();
+        this.isDeleted = false;
+        this.updateTime = currentTime;
+
+        return this;
     }
 
     private void checkOwner(String userId) {

@@ -1,4 +1,4 @@
-package potenday.backend.application.port;
+package potenday.backend.application;
 
 import java.time.Duration;
 import java.util.Map;

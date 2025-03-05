@@ -1,10 +1,9 @@
-package potenday.backend.infra.adapter.postgres;
+package potenday.backend.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import potenday.backend.domain.Dialogue;
 
 import java.io.IOException;
 import java.util.List;

@@ -26,9 +26,7 @@ class MinutesProcessor {
     private static final int MAX_NUM_CHUNKS = 100;
     private static final boolean KEEP_SEPARATOR = true;
     private static final int MAX_TOKENS = 4096;
-
     private static final int THREAD_POOL_SIZE = 5;
-
     private static final int MIN_SCRIPT_LENGTH = 100;
 
     private final ChatClient chatClient;

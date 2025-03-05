@@ -15,9 +15,9 @@ public class MeetingService {
     private final UserReader userReader;
     private final MeetingWriter meetingWriter;
 
-    public Meeting crateMeeting(String userId, MultipartFile audioFile) {
+    public Meeting crateMeeting(String userId, MultipartFile audioFile, int audioFileDuration) {
         userReader.validateExistUser(userId);
-        return meetingWriter.create(userId, audioFile);
+        return meetingWriter.create(userId, audioFile, audioFileDuration);
     }
 
     public Meeting updateMeeting(String meetingId, String userId, String title) {

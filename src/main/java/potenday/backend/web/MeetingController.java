@@ -3,6 +3,7 @@ package potenday.backend.web;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,10 +52,14 @@ class MeetingController {
         return MeetingResponse.from(meetingService.readMeeting(meetingId, userId));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    MeetingResponse createMeeting(@AuthenticationPrincipal String userId, MultipartFile audioFile) {
-        return MeetingResponse.from(meetingService.crateMeeting(userId, audioFile));
+    MeetingResponse createMeeting(
+        @AuthenticationPrincipal String userId,
+        MultipartFile audioFile,
+        @RequestParam Integer audioFileDuration
+    ) {
+        return MeetingResponse.from(meetingService.crateMeeting(userId, audioFile, audioFileDuration));
     }
 
     @PutMapping("/{meetingId}")

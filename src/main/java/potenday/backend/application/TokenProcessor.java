@@ -2,7 +2,6 @@ package potenday.backend.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import potenday.backend.application.port.TokenProvider;
 
 import java.time.Duration;
 import java.util.Map;

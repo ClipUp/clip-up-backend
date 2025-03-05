@@ -1,7 +1,7 @@
-package potenday.backend.infra.adapter;
+package potenday.backend.infra;
 
 import org.springframework.stereotype.Component;
-import potenday.backend.application.port.ClockProvider;
+import potenday.backend.application.ClockProvider;
 
 import java.time.Clock;
 

@@ -1,4 +1,4 @@
-package potenday.backend.application.port;
+package potenday.backend.application;
 
 public interface EncoderProvider {
 
