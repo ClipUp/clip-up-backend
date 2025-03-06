@@ -8,9 +8,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import potenday.backend.application.MeetingService;
+import potenday.backend.web.request.MeetingChatRequest;
 import potenday.backend.web.request.MeetingDeleteRequest;
 import potenday.backend.web.request.MeetingRestoreRequest;
 import potenday.backend.web.request.MeetingUpdateRequest;
+import potenday.backend.web.response.MeetingChatResponse;
 import potenday.backend.web.response.MeetingResponse;
 import potenday.backend.web.response.MeetingSummaryResponse;
 
@@ -78,6 +80,11 @@ class MeetingController {
     @DeleteMapping("/trash")
     void restoreMeeting(@AuthenticationPrincipal String userId, @RequestBody @Valid MeetingRestoreRequest request) {
         meetingService.restoreMeetings(userId, request.meetingIds());
+    }
+
+    @PostMapping("/{meetingId}/chat")
+    MeetingChatResponse chat(@PathVariable String meetingId, @RequestBody @Valid MeetingChatRequest request) {
+        return MeetingChatResponse.from(meetingService.chat(meetingId, request.question(), request.sessionId()));
     }
 
 }

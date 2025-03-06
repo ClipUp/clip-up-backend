@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
+import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletion.ChatCompletionMessage;
+import potenday.backend.springai.models.clova.api.ClovaApi.EmbeddingResponse.Embedding;
 import potenday.backend.springai.models.clova.api.common.ClovaApiClientErrorException;
 
 import java.util.List;
@@ -22,6 +24,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class ClovaApi {
 
     private final String completionsPath;
+    private final String embeddingsPath;
     private final RestClient restClient;
 
     @Builder
@@ -29,12 +32,15 @@ public class ClovaApi {
         String baseUrl,
         ApiKey apiKey,
         String completionsPath,
+        String embeddingsPath,
         RestClient.Builder restClientBuilder,
         ResponseErrorHandler responseErrorHandler
     ) {
         Assert.hasText(completionsPath, "Completions Path must not be null");
+        Assert.hasText(embeddingsPath, "Embedding Path must not be null");
 
         this.completionsPath = completionsPath;
+        this.embeddingsPath = embeddingsPath;
 
         Consumer<HttpHeaders> finalHeaders = h -> {
             if (!(apiKey instanceof NoopApiKey)) {
@@ -50,7 +56,7 @@ public class ClovaApi {
             .build();
     }
 
-    public ChatCompletion chatCompletionEntity(ChatCompletionRequest chatRequest) {
+    public ChatCompletion chatCompletion(ChatCompletionRequest chatRequest) {
         Assert.notNull(chatRequest, "The request body can not be null.");
 
         ResponseEntity<ChatCompletionResponse> chatResponse = this.restClient.post()
@@ -72,22 +78,65 @@ public class ClovaApi {
         return chatResponse.getBody().result;
     }
 
-    public enum ChatCompletionFinishReason {
-        @JsonProperty("length")
-        LENGTH,
+    public Embedding embeddings(EmbeddingRequest embeddingRequest) {
+        Assert.notNull(embeddingRequest, "The request body can not be null.");
+        Assert.notNull(embeddingRequest.text(), "The input text can not be null.");
 
-        @JsonProperty("end_token")
-        END_TOKEN,
+        ResponseEntity<EmbeddingResponse> embeddingResponse = this.restClient.post()
+            .uri(this.embeddingsPath)
+            .body(embeddingRequest)
+            .retrieve()
+            .onStatus(HttpStatus.TOO_MANY_REQUESTS::equals,
+                (request, response) -> {
+                    throw new ClovaApiClientErrorException("429 Too Many Requests");
+                }
+            )
+            .toEntity(EmbeddingResponse.class);
 
-        @JsonProperty("stop_before")
-        STOP_BEFORE
+        if (!embeddingResponse.getStatusCode().is2xxSuccessful() || embeddingResponse.getBody() == null) {
+            throw new RuntimeException("Network Error");
+        }
+
+        return embeddingResponse.getBody().result;
     }
 
     @JsonInclude(Include.NON_NULL)
-    public record ChatCompletionResponse(
-        @JsonProperty("status") Status status,
-        @JsonProperty("result") ChatCompletion result
+    public record ChatCompletion(
+        @JsonProperty("message") ChatCompletionMessage message,
+        @JsonProperty("stopReason") ChatCompletionFinishReason stopReason,
+        @JsonProperty("inputLength") Integer inputLength,
+        @JsonProperty("outputLength") Integer outputLength,
+        @JsonProperty("seed") Long seed
     ) {
+
+        public enum ChatCompletionFinishReason {
+            @JsonProperty("length")
+            LENGTH,
+
+            @JsonProperty("end_token")
+            END_TOKEN,
+
+            @JsonProperty("stop_before")
+            STOP_BEFORE
+        }
+
+        public record ChatCompletionMessage(
+            @JsonProperty("role") Role role,
+            @JsonProperty("content") String content
+        ) {
+
+            public enum Role {
+                @JsonProperty("system")
+                SYSTEM,
+
+                @JsonProperty("user")
+                USER,
+
+                @JsonProperty("assistant")
+                ASSISTANT,
+            }
+
+        }
 
     }
 
@@ -101,28 +150,6 @@ public class ClovaApi {
         public String toString() {
             return String.format("code: %s, message: %s", code, message);
         }
-
-    }
-
-    @JsonInclude(Include.NON_NULL)
-    public record ChatCompletion(
-        @JsonProperty("message") ChatCompletionMessage message,
-        @JsonProperty("stopReason") ChatCompletionFinishReason stopReason,
-        @JsonProperty("inputLength") Integer inputLength,
-        @JsonProperty("outputLength") Integer outputLength,
-        @JsonProperty("seed") Long seed
-    ) {
-
-    }
-
-    @JsonInclude(Include.NON_NULL)
-    public record AiFilter(
-        @JsonProperty("groupName") String groupName,
-        @JsonProperty("name") String name,
-        @JsonProperty("score") String score,
-        @JsonProperty("result") String result,
-        @JsonProperty("aiFilter") List<AiFilter> aiFilter
-    ) {
 
     }
 
@@ -146,20 +173,32 @@ public class ClovaApi {
 
     }
 
-    public record ChatCompletionMessage(
-        @JsonProperty("role") Role role,
-        @JsonProperty("content") String content
+    @JsonInclude(Include.NON_NULL)
+    public record ChatCompletionResponse(
+        @JsonProperty("status") Status status,
+        @JsonProperty("result") ChatCompletion result
     ) {
 
-        public enum Role {
-            @JsonProperty("system")
-            SYSTEM,
+    }
 
-            @JsonProperty("user")
-            USER,
+    @JsonInclude(Include.NON_NULL)
+    public record EmbeddingRequest(
+        @JsonProperty("text") String text
+    ) {
 
-            @JsonProperty("assistant")
-            ASSISTANT,
+    }
+
+    @JsonInclude(Include.NON_NULL)
+    public record EmbeddingResponse(
+        @JsonProperty("status") Status status,
+        @JsonProperty("result") Embedding result
+    ) {
+
+        @JsonInclude(Include.NON_NULL)
+        public record Embedding(
+            @JsonProperty("embedding") float[] embedding,
+            @JsonProperty("inputToken") Integer inputTokens) {
+
         }
 
     }

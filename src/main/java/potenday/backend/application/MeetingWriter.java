@@ -24,7 +24,7 @@ class MeetingWriter {
         String id = idProvider.nextId();
 
         STTProcessor.Result sttResult = sttProcessor.convert(id, audioFile);
-        String minutes = minutesProcessor.generate(sttResult.script());
+        String minutes = minutesProcessor.generate(id, sttResult.script());
 
         Meeting newMeeting = Meeting.create(id, userId, sttResult.audioFileUrl(), audioFileDuration, sttResult.script(), minutes, clockProvider.millis());
         meetingRepository.save(newMeeting);

@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.client.HttpStatusCodeException;
 import potenday.backend.springai.models.clova.api.ClovaApi;
 import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletion;
-import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletionMessage;
+import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletion.ChatCompletionMessage;
 import potenday.backend.springai.models.clova.api.ClovaApi.ChatCompletionRequest;
 import potenday.backend.springai.models.clova.api.common.ClovaAiApiConstants;
 import potenday.backend.springai.models.clova.api.common.ClovaApiClientErrorException;
@@ -84,7 +84,7 @@ public class ClovaChatModel implements ChatModel {
                 ChatCompletion chatCompletion = this.retryTemplate
                     .execute(ctx -> {
                         try {
-                            return clovaApi.chatCompletionEntity(request);
+                            return clovaApi.chatCompletion(request);
                         } catch (HttpStatusCodeException e) {
                             if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
                                 System.out.println("429 Too Many Requests - Retrying...");
@@ -128,14 +128,18 @@ public class ClovaChatModel implements ChatModel {
     }
 
     private ChatCompletionRequest createRequest(Prompt prompt) {
-        List<ChatCompletionMessage> chatCompletionMessages = prompt.getInstructions().stream().map(message -> {
-            if (message.getMessageType() == MessageType.USER || message.getMessageType() == MessageType.SYSTEM || message.getMessageType() == MessageType.ASSISTANT) {
-                return List.of(new ChatCompletionMessage(ChatCompletionMessage.Role.valueOf(message.getMessageType()
-                    .name()), message.getText()));
-            } else {
-                throw new IllegalArgumentException("Unsupported message type: " + message.getMessageType());
-            }
-        }).flatMap(List::stream).toList();
+        List<ChatCompletionMessage> chatCompletionMessages = prompt.getInstructions()
+            .stream()
+            .map(message -> {
+                if (message.getMessageType() == MessageType.USER || message.getMessageType() == MessageType.SYSTEM || message.getMessageType() == MessageType.ASSISTANT) {
+                    return List.of(new ChatCompletionMessage(ChatCompletionMessage.Role.valueOf(message.getMessageType()
+                        .name()), message.getText()));
+                } else {
+                    throw new IllegalArgumentException("Unsupported message type: " + message.getMessageType());
+                }
+            })
+            .flatMap(List::stream)
+            .toList();
 
         ChatCompletionRequest request = ChatCompletionRequest.of(chatCompletionMessages);
 

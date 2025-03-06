@@ -42,3 +42,18 @@ CREATE TABLE clip_up.service_session
     create_time BIGINT              NOT NULL,
     update_time BIGINT              NOT NULL
 );
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE clip_up.vector_store
+(
+    id        UUID DEFAULT uuid_generate_v4() NOT NULL PRIMARY KEY,
+    content   TEXT,
+    metadata  JSON,
+    embedding VECTOR(1024)
+);
+
+CREATE INDEX spring_ai_vector_index ON clip_up.vector_store USING hnsw (embedding vector_cosine_ops);
+

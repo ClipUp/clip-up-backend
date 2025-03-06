@@ -63,7 +63,7 @@ public class Meeting {
 
         this.title = title;
         this.updateTime = currentTime;
-        
+
         return this;
     }
 

@@ -21,10 +21,14 @@ spring:
     secret: ${JWT_SECRET}
 
   ai:
+    vectorstore:
+      pgvector:
+        schema-name: clip_up
     clova:
-      base-url: https://clovastudio.stream.ntruss.com/
       api-key: ${CLOVA_API_KEY}
       chat:
+        app-name: testapp
+      embedding:
         app-name: testapp
       speech:
         invoke-url: ${CLOVA_SPEECH_INVOKE_URL}

@@ -3,6 +3,7 @@ package potenday.backend.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import potenday.backend.application.dto.ChatResponse;
 import potenday.backend.domain.Meeting;
 
 import java.util.List;
@@ -14,6 +15,7 @@ public class MeetingService {
     private final MeetingReader meetingReader;
     private final UserReader userReader;
     private final MeetingWriter meetingWriter;
+    private final MeetingChat meetingChat;
 
     public Meeting crateMeeting(String userId, MultipartFile audioFile, int audioFileDuration) {
         userReader.validateExistUser(userId);
@@ -46,6 +48,10 @@ public class MeetingService {
 
     public List<Meeting> readAllDeletedMeetings(String userId, String lastMeetingId, Integer limit) {
         return meetingReader.readAllDeleted(userId, lastMeetingId, limit);
+    }
+
+    public ChatResponse chat(String meetingId, String question, String sessionId) {
+        return meetingChat.chat(meetingId, question, sessionId);
     }
 
 }
