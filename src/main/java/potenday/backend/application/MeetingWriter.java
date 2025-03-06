@@ -58,6 +58,7 @@ class MeetingWriter {
         meetingRepository.saveAll(meetings);
     }
 
+    @Transactional
     Meeting migrate(String id) {
         Meeting existMeeting = findMeetingById(id);
 
