@@ -18,6 +18,9 @@ import potenday.backend.springai.models.clova.ClovaChatOptions;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -67,26 +70,38 @@ class MinutesProcessor {
         ChatOptions chatOptions = ClovaChatOptions.builder().maxTokens(MAX_TOKENS).build();
         Minutes totalMinutes = new Minutes();
 
-        int idx = 0;
-        int errorCount = 0;
-        while (idx < documents.size() && errorCount < 10) {
-            String json = chatClient.prompt()
-                .options(chatOptions)
-                .system(systemMessageTemplate)
-                .user(documents.get(idx).getText())
-                .call()
-                .content();
-            try {
-                Minutes minutes = objectMapper.readValue(json, Minutes.class);
-                totalMinutes.getDiscussions().addAll(minutes.getDiscussions());
-                totalMinutes.getDecisions().addAll(minutes.getDecisions());
-                idx++;
-            } catch (JsonProcessingException ignored) {
-                errorCount++;
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            List<CompletableFuture<Minutes>> futures = documents.stream()
+                .map(doc -> CompletableFuture.supplyAsync(() -> processDocument(doc, chatOptions), executor))
+                .toList();
+
+            for (CompletableFuture<Minutes> future : futures) {
+                try {
+                    Minutes minutes = future.get();
+                    totalMinutes.getDiscussions().addAll(minutes.getDiscussions());
+                    totalMinutes.getDecisions().addAll(minutes.getDecisions());
+                } catch (Exception ignored) {
+                }
             }
         }
 
         return totalMinutes.toString();
+    }
+
+    private Minutes processDocument(Document document, ChatOptions chatOptions) {
+        String text = document.getText();
+        String json = chatClient.prompt()
+            .options(chatOptions)
+            .system(systemMessageTemplate)
+            .user(text)
+            .call()
+            .content();
+
+        try {
+            return objectMapper.readValue(json, Minutes.class);
+        } catch (JsonProcessingException ignored) {
+            return new Minutes();
+        }
     }
 
     private void saveRAG(List<Document> documents) {

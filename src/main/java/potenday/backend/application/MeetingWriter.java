@@ -65,7 +65,7 @@ class MeetingWriter {
 
         Meeting migratedMeeting = existMeeting.migrate(minutes);
         meetingRepository.save(migratedMeeting);
-        
+
         return migratedMeeting;
     }
 

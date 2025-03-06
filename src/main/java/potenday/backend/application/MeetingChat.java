@@ -2,6 +2,7 @@ package potenday.backend.application;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
@@ -26,6 +27,7 @@ class MeetingChat {
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
     private final UUIDProvider uuidProvider;
+    private final MessageChatMemoryAdvisor chatMemoryAdvisor;
     @Value("classpath:/prompts/system-chat-message.st")
     private Resource systemMessageTemplate;
 
@@ -44,7 +46,9 @@ class MeetingChat {
                 .prompt(promptTemplate.create(Map.of("documents", documents)))
                 .options(chatOptions)
                 .user(question)
-                .advisors(advisorSpec -> advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, finalSessionId))
+                .advisors(chatMemoryAdvisor)
+                .advisors(advisorSpec ->
+                    advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, finalSessionId))
                 .call()
                 .content(),
             sessionId);
