@@ -59,7 +59,7 @@ public class Meeting {
     }
 
     private static String extractTitle(String minutes) {
-        return minutes.length() > DEFAULT_TITLE_LENGTH ? minutes.substring(0, DEFAULT_TITLE_LENGTH) : minutes
+        return minutes.length() > DEFAULT_TITLE_LENGTH ? minutes.substring(0, DEFAULT_TITLE_LENGTH) : minutes;
     }
 
     public Meeting update(String userId, String title, Long currentTime) {
