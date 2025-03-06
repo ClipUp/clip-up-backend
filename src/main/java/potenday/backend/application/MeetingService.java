@@ -54,4 +54,8 @@ public class MeetingService {
         return meetingChat.chat(meetingId, question, sessionId);
     }
 
+    public Meeting migrate(String meetingId) {
+        return meetingWriter.migrate(meetingId);
+    }
+
 }

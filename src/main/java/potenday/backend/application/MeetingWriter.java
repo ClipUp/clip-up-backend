@@ -58,6 +58,17 @@ class MeetingWriter {
         meetingRepository.saveAll(meetings);
     }
 
+    Meeting migrate(String id) {
+        Meeting existMeeting = findMeetingById(id);
+
+        String minutes = minutesProcessor.generate(existMeeting.getId(), existMeeting.getScript());
+
+        Meeting migratedMeeting = existMeeting.migrate(minutes);
+        meetingRepository.save(migratedMeeting);
+        
+        return migratedMeeting;
+    }
+
     private Meeting findMeetingById(String id) {
         return meetingRepository.findById(id)
             .orElseThrow(ErrorCode.MEETING_NOT_FOUNDED::toException);

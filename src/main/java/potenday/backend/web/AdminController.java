@@ -1,10 +1,7 @@
 package potenday.backend.web;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import potenday.backend.application.MeetingService;
 import potenday.backend.web.response.MeetingResponse;
 
@@ -18,6 +15,11 @@ class AdminController {
     @GetMapping("/meetings/{meetingId}")
     MeetingResponse readMeeting(@PathVariable String meetingId) {
         return MeetingResponse.from(meetingService.readMeeting(meetingId));
+    }
+
+    @PostMapping("/meetings/{meetingId}/migration")
+    MeetingResponse migrate(@PathVariable String meetingId) {
+        return MeetingResponse.from(meetingService.migrate(meetingId));
     }
 
 }

@@ -85,6 +85,12 @@ public class Meeting {
         return this;
     }
 
+    public Meeting migrate(String minutes) {
+        this.minutes = minutes;
+
+        return this;
+    }
+
     private void checkOwner(String userId) {
         if (!userId.equals(ownerId)) {
             throw ErrorCode.UNAUTHORIZED.toException();
