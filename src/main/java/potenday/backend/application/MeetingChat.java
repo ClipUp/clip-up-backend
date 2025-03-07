@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import potenday.backend.application.dto.ChatResponse;
+import potenday.backend.domain.Meeting;
 import potenday.backend.springai.models.clova.ClovaChatOptions;
 
 import java.util.List;
@@ -32,19 +33,19 @@ class MeetingChat {
     @Value("classpath:/prompts/system-chat-message.st")
     private Resource systemMessageTemplate;
 
-    public ChatResponse chat(String id, String question, String sessionId) {
+    public ChatResponse chat(Meeting meeting, String question, String sessionId) {
         if (sessionId == null) {
             sessionId = createSessionId();
         }
 
-        List<Document> documents = getFilteredDocuments(id, question);
+        List<Document> documents = getFilteredDocuments(meeting.getId(), question);
 
         ChatOptions chatOptions = ClovaChatOptions.builder().maxTokens(MAX_TOKENS).build();
 
         PromptTemplate promptTemplate = new PromptTemplate(systemMessageTemplate);
         String finalSessionId = sessionId;
         return ChatResponse.of(chatClient
-                .prompt(promptTemplate.create(Map.of("documents", documents)))
+                .prompt(promptTemplate.create(Map.of("minutes", meeting.getMinutes(), "documents", documents)))
                 .options(chatOptions)
                 .user(question)
                 .advisors(chatMemoryAdvisor)

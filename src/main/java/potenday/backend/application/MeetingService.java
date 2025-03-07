@@ -51,7 +51,8 @@ public class MeetingService {
     }
 
     public ChatResponse chat(String meetingId, String question, String sessionId) {
-        return meetingChat.chat(meetingId, question, sessionId);
+        Meeting existingMeeting = meetingReader.read(meetingId);
+        return meetingChat.chat(existingMeeting, question, sessionId);
     }
 
     public Meeting migrate(String meetingId) {
