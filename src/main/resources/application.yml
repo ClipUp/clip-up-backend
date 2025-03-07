@@ -24,6 +24,9 @@ spring:
     vectorstore:
       pgvector:
         schema-name: clip_up
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimension: 1024
     clova:
       api-key: ${CLOVA_API_KEY}
       chat:
