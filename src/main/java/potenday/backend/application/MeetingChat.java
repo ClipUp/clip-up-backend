@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 @RequiredArgsConstructor
 @Component
@@ -48,7 +49,8 @@ class MeetingChat {
                 .user(question)
                 .advisors(chatMemoryAdvisor)
                 .advisors(advisorSpec ->
-                    advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, finalSessionId))
+                    advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, finalSessionId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 3))
                 .call()
                 .content(),
             sessionId);
