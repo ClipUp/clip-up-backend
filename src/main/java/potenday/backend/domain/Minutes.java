@@ -22,6 +22,33 @@ public class Minutes {
         StringBuilder sb = new StringBuilder();
 
         if (!discussions.isEmpty()) {
+            sb.append("논의 내용");
+            for (Discussion discussion : discussions) {
+                sb.append(" ").append(discussion.title()).append(" ");
+                if (discussion.content() != null && !discussion.content().isEmpty()) {
+                    sb.append(discussion.content().stream()
+                        .map(line -> " " + line)
+                        .collect(Collectors.joining(" "))
+                    ).append(" ");
+                }
+            }
+        }
+
+        if (!decisions.isEmpty()) {
+            sb.append("결정 사항");
+            sb.append(decisions.stream()
+                .map(decision -> " " + decision)
+                .collect(Collectors.joining(" "))
+            ).append(" ");
+        }
+
+        return sb.toString();
+    }
+
+    public String toMarkdown() {
+        StringBuilder sb = new StringBuilder();
+
+        if (!discussions.isEmpty()) {
             sb.append("# 논의 내용\n\n");
             for (Discussion discussion : discussions) {
                 sb.append("## ").append(discussion.title()).append("\n");

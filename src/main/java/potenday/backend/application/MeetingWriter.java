@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import potenday.backend.domain.Meeting;
+import potenday.backend.domain.Minutes;
 import potenday.backend.domain.repository.MeetingRepository;
 import potenday.backend.support.exception.ErrorCode;
 
@@ -24,7 +25,7 @@ class MeetingWriter {
         String id = idProvider.nextId();
 
         STTProcessor.Result sttResult = sttProcessor.convert(id, audioFile);
-        String minutes = minutesProcessor.generate(id, sttResult.script());
+        Minutes minutes = minutesProcessor.generate(id, sttResult.script());
 
         Meeting newMeeting = Meeting.create(id, userId, sttResult.audioFileUrl(), audioFileDuration, sttResult.script(), minutes, clockProvider.millis());
         meetingRepository.save(newMeeting);
@@ -62,7 +63,8 @@ class MeetingWriter {
     Meeting migrate(String id) {
         Meeting existMeeting = findMeetingById(id);
 
-        String minutes = minutesProcessor.generate(existMeeting.getId(), existMeeting.getScript());
+        minutesProcessor.deleteRAGByMeetingId(existMeeting.getId());
+        Minutes minutes = minutesProcessor.generate(existMeeting.getId(), existMeeting.getScript());
 
         Meeting migratedMeeting = existMeeting.migrate(minutes);
         meetingRepository.save(migratedMeeting);

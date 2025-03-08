@@ -9,12 +9,15 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.transformer.splitter.TextSplitter;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import potenday.backend.domain.Dialogue;
 import potenday.backend.domain.Minutes;
 import potenday.backend.springai.models.clova.ClovaChatOptions;
+import potenday.backend.support.exception.ErrorCode;
 
 import java.util.List;
 import java.util.Map;
@@ -42,17 +45,22 @@ class MinutesProcessor {
     @Value("classpath:/prompts/system-minutes-message.st")
     private Resource systemMessageTemplate;
 
-    String generate(String id, List<Dialogue> script) {
+    Minutes generate(String id, List<Dialogue> script) {
         List<Document> documents = toDocuments(id, script);
         if (documents.isEmpty()) {
-            return "회의 내용이 존재하지 않습니다.";
+            throw ErrorCode.MEETING_IS_EMPTY.toException();
         }
         if (documents.size() == 1 && documents.getFirst().getText().length() < MIN_SCRIPT_LENGTH) {
-            return "회의 내용이 너무 적습니다.";
+            return new Minutes();
         }
 
         saveRAG(documents);
         return chat(documents);
+    }
+
+    void deleteRAGByMeetingId(String meetingId) {
+        Filter.Expression expression = new FilterExpressionBuilder().eq("meetingId", meetingId).build();
+        vectorStore.delete(expression);
     }
 
     private List<Document> toDocuments(String id, List<Dialogue> script) {
@@ -66,7 +74,7 @@ class MinutesProcessor {
         return textSplitter.split(document);
     }
 
-    private String chat(List<Document> documents) {
+    private Minutes chat(List<Document> documents) {
         ChatOptions chatOptions = ClovaChatOptions.builder().maxTokens(MAX_TOKENS).build();
         Minutes totalMinutes = new Minutes();
 
@@ -85,7 +93,7 @@ class MinutesProcessor {
             }
         }
 
-        return totalMinutes.toString();
+        return totalMinutes;
     }
 
     private Minutes processDocument(Document document, ChatOptions chatOptions) {

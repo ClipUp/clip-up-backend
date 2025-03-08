@@ -41,7 +41,7 @@ public class Meeting {
         String audioFileUrl,
         int audioFileDuration,
         List<Dialogue> script,
-        String minutes,
+        Minutes minutes,
         Long currentTime
     ) {
         return Meeting.builder()
@@ -50,8 +50,8 @@ public class Meeting {
             .audioFileUrl(audioFileUrl)
             .audioFileDuration(audioFileDuration)
             .script(script)
-            .minutes(minutes)
-            .title(extractTitle(minutes))
+            .title(extractTitle(minutes.toString()))
+            .minutes(minutes.toMarkdown())
             .createTime(currentTime)
             .updateTime(currentTime)
             .isDeleted(false)
@@ -89,9 +89,9 @@ public class Meeting {
         return this;
     }
 
-    public Meeting migrate(String minutes) {
-        this.title = extractTitle(minutes);
-        this.minutes = minutes;
+    public Meeting migrate(Minutes minutes) {
+        this.title = extractTitle(minutes.toString());
+        this.minutes = minutes.toMarkdown();
 
         return this;
     }

@@ -22,6 +22,7 @@ public enum ErrorCode {
 
     // Meeting
     MEETING_NOT_FOUNDED(HttpStatus.NOT_FOUND, "존재하지 않는 회의입니다."),
+    MEETING_IS_EMPTY(HttpStatus.BAD_REQUEST, "회의 내용이 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;
