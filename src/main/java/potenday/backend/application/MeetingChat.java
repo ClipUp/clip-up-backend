@@ -24,7 +24,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 @Component
 class MeetingChat {
 
-    private static final int MAX_TOKENS = 4096;
+    private static final int MAX_TOKENS = 2000;
 
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
@@ -36,6 +36,13 @@ class MeetingChat {
     public ChatResponse chat(Meeting meeting, String question, String sessionId) {
         if (sessionId == null) {
             sessionId = createSessionId();
+        }
+
+        if (meeting.getScript().isEmpty()) {
+            return ChatResponse.of(
+                "회의 스크립트가 존재하지 않아, 답변 할 수 없습니다.",
+                sessionId
+            );
         }
 
         List<Document> documents = getFilteredDocuments(meeting.getId(), question);
