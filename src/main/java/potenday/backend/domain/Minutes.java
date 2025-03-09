@@ -24,22 +24,22 @@ public class Minutes {
         if (!discussions.isEmpty()) {
             sb.append("논의 내용");
             for (Discussion discussion : discussions) {
-                sb.append(" ").append(discussion.title()).append(" ");
+                sb.append(" ").append(discussion.title());
                 if (discussion.content() != null && !discussion.content().isEmpty()) {
                     sb.append(discussion.content().stream()
                         .map(line -> " " + line)
-                        .collect(Collectors.joining(" "))
-                    ).append(" ");
+                        .collect(Collectors.joining(""))
+                    );
                 }
             }
         }
 
         if (!decisions.isEmpty()) {
-            sb.append("결정 사항");
+            sb.append(" 결정 사항");
             sb.append(decisions.stream()
                 .map(decision -> " " + decision)
-                .collect(Collectors.joining(" "))
-            ).append(" ");
+                .collect(Collectors.joining(""))
+            );
         }
 
         if (sb.isEmpty()) {
