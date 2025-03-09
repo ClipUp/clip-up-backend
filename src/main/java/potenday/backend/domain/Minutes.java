@@ -42,6 +42,10 @@ public class Minutes {
             ).append(" ");
         }
 
+        if (sb.isEmpty()) {
+            return "회의 내용이 너무 적습니다.";
+        }
+
         return sb.toString();
     }
 
@@ -67,6 +71,10 @@ public class Minutes {
                 .map(decision -> "- " + decision)
                 .collect(Collectors.joining("\n"))
             ).append("\n");
+        }
+
+        if (sb.isEmpty()) {
+            return "회의 내용이 너무 적습니다.";
         }
 
         return sb.toString();
