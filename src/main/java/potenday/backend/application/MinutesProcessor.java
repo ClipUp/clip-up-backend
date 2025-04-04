@@ -83,13 +83,18 @@ class MinutesProcessor {
                 .map(doc -> CompletableFuture.supplyAsync(() -> processDocument(doc, chatOptions), executor))
                 .toList();
 
-            for (CompletableFuture<Minutes> future : futures) {
-                try {
-                    Minutes minutes = future.get();
-                    totalMinutes.getDiscussions().addAll(minutes.getDiscussions());
-                    totalMinutes.getDecisions().addAll(minutes.getDecisions());
-                } catch (Exception ignored) {
-                }
+            List<Minutes> results = futures.stream()
+                .map(future -> {
+                    try {
+                        return future.get();
+                    } catch (Exception e) {
+                        return new Minutes();
+                    }
+                }).toList();
+
+            for (Minutes minutes : results) {
+                totalMinutes.getDiscussions().addAll(minutes.getDiscussions());
+                totalMinutes.getDecisions().addAll(minutes.getDecisions());
             }
         }
 
